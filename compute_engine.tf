@@ -28,13 +28,24 @@ resource "google_compute_instance_template" "minecraft" {
   metadata_startup_script = data.template_file.bootstrap.rendered
 
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_pub_key_file)}"
+    ssh-keys        = "${var.ssh_user}:${file(var.ssh_pub_key_file)}"
+    shutdown-script = data.template_file.shutdown.rendered
+  }
+
+  service_account {
+    scopes = [
+      "compute-ro",
+      "storage-rw"
+    ]
   }
 
   lifecycle {
     create_before_destroy = true
   }
 
+  depends_on = [
+    google_storage_bucket.minecraft
+  ]
 }
 
 resource "google_compute_instance_group_manager" "minecraft" {

@@ -28,13 +28,13 @@ variable "project_name" {
 variable "machine_type" {
   description = "The type of machine to spin up. Defaults to `n1-standard-1`"
   type        = string
-  default     = "n1-standard-1"
+  default     = "n1-standard-2"
 }
 
 variable "server_image" {
-  description = "The boot image used on the server. Defaults to `debian-cloud/debian-9`"
+  description = "The boot image used on the server. Defaults to `ubuntu-1804-bionic-v20191211`"
   type        = string
-  default     = "debian-cloud/debian-9"
+  default     = "ubuntu-1804-bionic-v20191211"
 }
 
 variable "ssh_user" {
@@ -72,4 +72,44 @@ variable "game_whitelist_ips" {
 variable "admin_whitelist_ips" {
   description = "The IPs to allow for admin access to instance"
   type        = list(string)
+}
+
+#### Backup Variables
+
+variable "backup_length" {
+  description = "How many days will a backup last in the bucket?"
+  type        = number
+  default     = 5
+}
+
+variable "backup_cron" {
+  description = "The frequency of backups, which should be written in a cron string. Defaults to 11:59pm on each Weds."
+  type        = string
+  default     = "59 23 * * 3"
+}
+
+#### Bootstrap Variables
+
+variable "mc_home_folder" {
+  description = "The location of the Minecraft server files on the instance"
+  type        = string
+  default     = "/home/minecraft"
+}
+
+variable "mc_server_download_link" {
+  description = "The direct download link to download the server jar. Defaults to a link with 1.16.5."
+  type        = string
+  default     = "https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"
+}
+
+variable "server_min_ram" {
+  description = "The minimum amount of RAM to allocate to the server process"
+  type        = string
+  default     = "1G"
+}
+
+variable "server_max_ram" {
+  description = "The maximum amount of RAM to allocate to the server process"
+  type        = string
+  default     = "7G"
 }
