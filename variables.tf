@@ -82,12 +82,6 @@ variable "backup_length" {
   default     = 5
 }
 
-variable "backup_cron" {
-  description = "The frequency of backups, which should be written in a cron string. Defaults to 11:59pm on each Weds."
-  type        = string
-  default     = "59 23 * * 3"
-}
-
 #### Bootstrap Variables
 
 variable "mc_home_folder" {

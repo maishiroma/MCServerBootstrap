@@ -32,8 +32,8 @@ setup_mc_server() {
     set -e
 
     sed -i 's/eula=false/eula=true/g' eula.txt
-    echo "Sleeping for 120 seconds"
-    sleep 120
+    touch eula.txt
+
     screen -dm -S mcs /bin/bash -c 'java -Xms${server_min_ram} -Xmx${server_max_ram} -jar $JAR_NAME nogui; exec /bin/bash'
 }
 
@@ -50,7 +50,6 @@ screen -r mcs -X stuff '/save-on\n'
 EOF
 
     chmod 755 ./backup.sh
-    $(crontab -l 2>/dev/null; echo "\"${backup_cron}\" ${mc_home_folder}/backup.sh") | crontab -
 }
 
 configure_restart() {
@@ -59,7 +58,6 @@ configure_restart() {
     cat << EOF > ./restart.sh
 #!/bin/bash
 mount -t ext4 /dev/sdb ${mc_home_folder}
-\$(crontab -l 2>/dev/null; echo "\"${backup_cron}\" ${mc_home_folder}/backup.sh") | crontab -
 screen -dm -S mcs /bin/bash -c 'java -Xms${server_min_ram} -Xmx${server_max_ram} -jar $JAR_NAME nogui; exec /bin/bash'
 EOF
 

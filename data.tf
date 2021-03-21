@@ -11,7 +11,6 @@ data "template_file" "bootstrap" {
     server_min_ram          = var.server_min_ram
     server_max_ram          = var.server_max_ram
     backup_bucket           = google_storage_bucket.minecraft.name
-    backup_cron             = var.backup_cron
   }
 }
 
