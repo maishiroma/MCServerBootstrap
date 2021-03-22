@@ -4,14 +4,14 @@ resource "google_compute_instance" "minecraft" {
   zone         = local.zone_name
 
   boot_disk {
-    initialize_params  {
+    initialize_params {
       image = var.server_image
     }
   }
 
   attached_disk {
     source = google_compute_disk.minecraft.name
-    mode = "READ_WRITE"
+    mode   = "READ_WRITE"
   }
 
   network_interface {
@@ -35,10 +35,6 @@ resource "google_compute_instance" "minecraft" {
       "compute-ro",
       "storage-rw"
     ]
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 
   depends_on = [
