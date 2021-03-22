@@ -18,7 +18,7 @@ variable "zone_prefix" {
 }
 
 variable "project_name" {
-  description = "The name of the project."
+  description = "The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name."
   type        = string
   default     = "mc-server-bootstrap"
 }
@@ -26,7 +26,7 @@ variable "project_name" {
 #### Server Variables
 
 variable "machine_type" {
-  description = "The type of machine to spin up. Defaults to `n1-standard-1`"
+  description = "The type of machine to spin up. If the instance is struggling, it might be worthwhile to use stronger machines."
   type        = string
   default     = "n1-standard-2"
 }
@@ -65,12 +65,12 @@ variable "network_name" {
 }
 
 variable "game_whitelist_ips" {
-  description = "The IPs used to connect to the instance"
+  description = "The IPs used to connect to the Minecraft server itself through the MC client."
   type        = list(string)
 }
 
 variable "admin_whitelist_ips" {
-  description = "The IPs to allow for admin access to instance"
+  description = "The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting."
   type        = list(string)
 }
 
