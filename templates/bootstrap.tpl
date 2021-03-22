@@ -22,10 +22,10 @@ prepare_ssd() {
     
     if [ ! -d "${mc_script_location}" ]; then
         mkdir ${mc_script_location}
-
-        configure_backups
-        configure_restore_backup
     fi
+    configure_backups
+    configure_restore_backup
+    configure_restart
 }
 
 install_pre_req() {
@@ -43,6 +43,7 @@ setup_mc_server() {
     cd ${mc_home_folder}
     if [ ! -f "${mc_home_folder}/$JAR_NAME" ]; then
         wget -O ${mc_home_folder}/$JAR_NAME ${mc_server_download_link}
+        configure_initial_mcserver
 
         set +e
         $SCREEN_CMD
@@ -87,6 +88,76 @@ command="$SCREEN_CMD" screen -S $SCREEN_SES -d -m bash -c '\$command; exec bash'
 echo "Restored backup. It will take a few seconds for the server to be back up."
 EOF
     chmod 755 ${mc_script_location}/restore_backup.sh
+}
+
+configure_restart() {
+    cat << EOF > ${mc_script_location}/restart.sh
+#!/bin/bash
+cd ${mc_home_folder}
+echo "Now restarting MC Server..."
+screen -S $SCREEN_SES -r -X stuff '/stop\n'
+sleep 10
+screen -S $SCREEN_SES -p 0 -X quit
+command="$SCREEN_CMD" screen -S $SCREEN_SES -d -m bash -c '\$command; exec bash'
+echo "Started up server again! Give it a few seconds to reload up!"
+EOF
+    chmod 755 ${mc_script_location}/restart.sh
+}
+
+configure_initial_mcserver() {
+    cat << EOF > ${mc_home_folder}/server.properties
+#Minecraft server properties
+enable-jmx-monitoring=false
+rcon.port=25575
+level-seed=
+gamemode=survival
+enable-command-block=false
+enable-query=false
+generator-settings=
+level-name=world
+motd=A Minecraft Server
+query.port=25565
+pvp=true
+generate-structures=true
+difficulty=easy
+network-compression-threshold=256
+max-tick-time=60000
+max-players=20
+use-native-transport=true
+online-mode=true
+enable-status=true
+allow-flight=false
+broadcast-rcon-to-ops=true
+view-distance=10
+max-build-height=256
+server-ip=
+allow-nether=true
+server-port=25565
+enable-rcon=false
+sync-chunk-writes=true
+op-permission-level=4
+prevent-proxy-connections=false
+resource-pack=
+entity-broadcast-range-percentage=100
+rcon.password=
+player-idle-timeout=0
+force-gamemode=false
+rate-limit=0
+hardcore=false
+white-list=false
+broadcast-console-to-ops=true
+spawn-npcs=true
+spawn-animals=true
+snooper-enabled=true
+function-permission-level=2
+level-type=default
+spawn-monsters=true
+enforce-whitelist=false
+resource-pack-sha1=
+spawn-protection=16
+max-world-size=29999984
+EOF
+    chmod 644 ${mc_home_folder}/server.properties
 }
 
 ## MAIN

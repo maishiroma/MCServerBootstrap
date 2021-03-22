@@ -59,9 +59,8 @@ The overall cost to run this project varies greatly with usage and instance size
         - `ssh_pub_key_file`
         - `game_whitelist_ips`
         - `admin_whitelist_ips`
-
-> These values can be seen in the upcoming minor section
-
+    - Configure the initial settings of the `server.properties` in the `bootstrap.tpl`
+        - Note that any changes made to this _after_ the server initially spins up will __NOT__ take place
 6. Run `terraform init`
 7. Run `terraform plan` (should get 11 new resources created) and it it looks good, `terraform apply`
 8. Sit back for a few mins and your new Minecraft Server should be running at the `ip_address` the `terraform apply` outputs!
@@ -81,13 +80,16 @@ While most of the configuration has verbose descriptions, there are some that ar
 
 By default, rebooting and respinning up an instance will automatically set up the server for you. No need for any action on you!
 
-Backup/Restores can be performed via the following scripts:
+Backup, restores and restarts can be performed via the following scripts:
 - `/home/minecraft/scripts/backup.sh` (default location)
     - Pushes up current state of server to Cloud Storage Buckets.
     - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
 - `/home/minecraft/scripts/restore_backup.sh` (default location)
     - Restores the server world to the specified state
     - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBaackup`
+- `/home/minecraft/scripts/restart.sh` (default location)
+    - Restarts the Minecraft server (not the instance)
+    - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
 
 To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI if one has that configured.
 
@@ -96,6 +98,7 @@ To keep costs low, it is a good idea to stop this instance when it is not in use
 - [] Create automated process to perform backups (cron job, ansible)
 - [] Create a process to restore backups, possibly allowing the user to see a list of all backups in bucket
 - [] Add a curated list of Minecraft versions that allows the end user to just specify the `version` instead of a URL link
+- [] Find a way to more easily set up the initial server properies, instead of being in the metadata
 
 ## Inspiration
 
