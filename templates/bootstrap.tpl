@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 
 # This will run during initial launch and relaunches of the instance (i.e. when it is destroyed)
 # All variables in here are interpolated into Terraform
