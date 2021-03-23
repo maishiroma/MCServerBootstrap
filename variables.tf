@@ -58,19 +58,19 @@ variable "disk_size" {
 
 #### Network Variables
 
-variable "network_name" {
-  description = "The network used to host the instance on."
+variable "existing_subnetwork_name" {
+  description = "An existing subnetwork to leverage placing the instances. Assumes that the firewalls in the subnetwork are already configured."
   type        = string
-  default     = "minecraft"
+  default     = ""
 }
 
 variable "game_whitelist_ips" {
-  description = "The IPs used to connect to the Minecraft server itself through the MC client."
+  description = "The IPs used to connect to the Minecraft server itself through the MC client. If existing_subnetwork_name is specified, this will be ignored."
   type        = list(string)
 }
 
 variable "admin_whitelist_ips" {
-  description = "The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting."
+  description = "The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting. If existing_subnetwork_name is specified, this will be ignored."
   type        = list(string)
 }
 

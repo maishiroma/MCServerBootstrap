@@ -15,7 +15,7 @@ resource "google_compute_instance" "minecraft" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.minecraft.name
+    subnetwork = var.existing_subnetwork_name == "" ? local.unique_resource_name : var.existing_subnetwork_name
 
     access_config {
       network_tier = "STANDARD"
@@ -44,7 +44,8 @@ resource "google_compute_instance" "minecraft" {
   labels = local.common_labels
 
   depends_on = [
-    google_storage_bucket.minecraft
+    google_storage_bucket.minecraft,
+    google_compute_subnetwork.minecraft
   ]
 }
 

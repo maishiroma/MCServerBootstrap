@@ -1,19 +1,25 @@
 resource "google_compute_network" "minecraft" {
+  count = var.existing_subnetwork_name == "" ? 1 : 0
+
   name                    = local.unique_resource_name
   description             = "The VPC used to host the minecraft instance"
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "minecraft" {
+  count = var.existing_subnetwork_name == "" ? 1 : 0
+
   name          = local.unique_resource_name
-  network       = google_compute_network.minecraft.id
+  network       = google_compute_network.minecraft[count.index].id
   region        = var.region
   ip_cidr_range = "10.128.0.0/9"
 }
 
 resource "google_compute_firewall" "ingress_game" {
+  count = var.existing_subnetwork_name == "" ? 1 : 0
+
   name        = local.unique_resource_name
-  network     = google_compute_network.minecraft.id
+  network     = google_compute_network.minecraft[count.index].id
   description = "Ingress traffic to instances for game trafffic"
 
   direction = "INGRESS"
@@ -29,8 +35,10 @@ resource "google_compute_firewall" "ingress_game" {
 }
 
 resource "google_compute_firewall" "ingress_admin" {
+  count = var.existing_subnetwork_name == "" ? 1 : 0
+
   name        = local.unique_resource_name
-  network     = google_compute_network.minecraft.id
+  network     = google_compute_network.minecraft[count.index].id
   description = "Ingress traffic to instances for admin access"
 
   direction = "INGRESS"
@@ -50,8 +58,10 @@ resource "google_compute_firewall" "ingress_admin" {
 }
 
 resource "google_compute_firewall" "egress" {
+  count = var.existing_subnetwork_name == "" ? 1 : 0
+
   name        = local.unique_resource_name
-  network     = google_compute_network.minecraft.id
+  network     = google_compute_network.minecraft[count.index].id
   description = "egress traffic from instances"
 
   direction = "EGRESS"
