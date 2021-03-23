@@ -28,6 +28,10 @@ resource "google_compute_instance" "minecraft" {
   metadata = {
     ssh-keys        = "${var.ssh_user}:${file(var.ssh_pub_key_file)}"
     shutdown-script = data.template_file.shutdown.rendered
+    backup-conf     = data.template_file.backup_script.rendered
+    restore-conf    = data.template_file.restore_backup_script.rendered
+    restart-conf    = data.template_file.restart_script.rendered
+    mc-conf         = data.template_file.mc_server_conf.rendered
   }
 
   service_account {
