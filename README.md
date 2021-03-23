@@ -52,17 +52,16 @@ The overall cost to run this project varies greatly with usage and instance size
 
 4. Enable the following APIs in the GCP Console:
     - `Compute Engine API` 
-5. Clone this repository onto your computer and perform the follwing steps:
+5. Refer to this [example](./example) directory and configure it, keeping in mind of:
     - Change the __project name__ in `main.tf` if you are not using the project name in there.
     - Create a `terraform.tfvars` and define the following values:
         - `creds_json`
         - `ssh_pub_key_file`
         - `game_whitelist_ips`
         - `admin_whitelist_ips`
-    - Configure the initial settings of the `server.properties` in the `bootstrap.tpl`
-        - Note that any changes made to this _after_ the server initially spins up will __NOT__ take place
+    - (Optional) Configure the initial settings of the `server.properties` in the `server_properties.tpl`
 6. Run `terraform init`
-7. Run `terraform plan` (should get 11 new resources created) and it it looks good, `terraform apply`
+7. Run `terraform plan` (should get 10 new resources created) and it it looks good, `terraform apply`
 8. Sit back for a few mins and your new Minecraft Server should be running at the `ip_address` the `terraform apply` outputs!
 
 ## Terraform Configuration Nuances
@@ -75,6 +74,8 @@ While most of the configuration has verbose descriptions, there are some that ar
 | `game_whitelist_ips`           | To ban/allow players into the game, it is handled on the infrastructure level. As such, make sure to get your friend's IPs and place them in here, so they can acces this instance! |
 | `admin_whitelist_ips` | This should only be restricted to the person that is administrating this server. Not correlated to `admin` power in Minecraft; this is moreso system admin access |
 | `mc_server_download_link` | One easy way to get different versions of Minecraft can be gotten at [this](https://mcversions.net/) link. Just find the right server version, right click on the download URL and save it, placing it in this value. |
+| `server_property_template` | This could change consistenty in the server, making it tricky to keep track of in this code. As such, any new changes made after the initial deployment of the server will __NOT__ be reflected in code. To use a new config if one changed it outside of the server, one must manually go onto the instance and edit the config to match what is down in code. |
+| `existing_subnetwork_name` | This allows for multiple instances of this module to be deployed in the same network, for easier management. To properly use this, make sure one module of this stack is deployed, with the other module calls referencing the `created_subnetwork` output of the first module. |
 
 ## General Server Management
 
@@ -98,7 +99,7 @@ To keep costs low, it is a good idea to stop this instance when it is not in use
 - [] Create automated process to perform backups (cron job, ansible)
 - [] Create a process to restore backups, possibly allowing the user to see a list of all backups in bucket
 - [] Add a curated list of Minecraft versions that allows the end user to just specify the `version` instead of a URL link
-- [] Find a way to more easily set up the initial server properies, instead of being in the metadata
+- [x] Find a way to more easily set up the initial server properies, instead of being in the metadata
 
 ## Inspiration
 

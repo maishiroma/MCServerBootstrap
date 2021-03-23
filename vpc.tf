@@ -1,7 +1,7 @@
 resource "google_compute_network" "minecraft" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
-  name                    = local.unique_resource_name
+  name                    = "${local.unique_resource_name}-net"
   description             = "The VPC used to host the minecraft instance"
   auto_create_subnetworks = false
 }
@@ -9,7 +9,7 @@ resource "google_compute_network" "minecraft" {
 resource "google_compute_subnetwork" "minecraft" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
-  name          = local.unique_resource_name
+  name          = local.subnet_name
   network       = google_compute_network.minecraft[count.index].id
   region        = var.region
   ip_cidr_range = "10.128.0.0/9"
@@ -18,7 +18,7 @@ resource "google_compute_subnetwork" "minecraft" {
 resource "google_compute_firewall" "ingress_game" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
-  name        = local.unique_resource_name
+  name        = "${local.unique_resource_name}-game"
   network     = google_compute_network.minecraft[count.index].id
   description = "Ingress traffic to instances for game trafffic"
 
@@ -37,7 +37,7 @@ resource "google_compute_firewall" "ingress_game" {
 resource "google_compute_firewall" "ingress_admin" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
-  name        = local.unique_resource_name
+  name        = "${local.unique_resource_name}-ops"
   network     = google_compute_network.minecraft[count.index].id
   description = "Ingress traffic to instances for admin access"
 
@@ -60,7 +60,7 @@ resource "google_compute_firewall" "ingress_admin" {
 resource "google_compute_firewall" "egress" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
-  name        = local.unique_resource_name
+  name        = "${local.unique_resource_name}-out"
   network     = google_compute_network.minecraft[count.index].id
   description = "egress traffic from instances"
 
@@ -74,7 +74,7 @@ resource "google_compute_firewall" "egress" {
 }
 
 resource "google_compute_address" "minecraft" {
-  name        = local.unique_resource_name
+  name        = "${local.unique_resource_name}-public"
   description = "The static IP used to access this instance extenrally"
 
   address_type = "EXTERNAL"

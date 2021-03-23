@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 
 # This will run during initial launch and relaunches of the instance (i.e. when it is destroyed)
 # All variables in here are interpolated into Terraform
@@ -50,12 +49,15 @@ place_metadata_config() {
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${backup_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/backup.sh
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${restore_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/restore_backup.sh
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${restart_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/restart.sh
-    gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${mc_server_prop_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_home_folder}/server.properties
 
     chmod 755 ${mc_script_location}/backup.sh
     chmod 755 ${mc_script_location}/restore_backup.sh
     chmod 755 ${mc_script_location}/restart.sh
-    chmod 644 ${mc_home_folder}/server.properties
+
+    if [ ! -f "${mc_home_folder}/server.properties" ]; then
+        gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${mc_server_prop_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_home_folder}/server.properties
+        chmod 644 ${mc_home_folder}/server.properties
+    fi
 }
 
 ## MAIN

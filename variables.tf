@@ -107,3 +107,9 @@ variable "server_max_ram" {
   type        = string
   default     = "7G"
 }
+
+variable "server_property_template" {
+  description = "The file path used to parse the server property file for the MC server. Defaults to the standard one in the module"
+  type        = string
+  default     = "./templates/server_properties.tpl"
+}

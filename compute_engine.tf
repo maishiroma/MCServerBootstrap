@@ -1,5 +1,5 @@
 resource "google_compute_instance" "minecraft" {
-  name         = local.unique_resource_name
+  name         = local.instance_name
   machine_type = var.machine_type
   zone         = local.zone_name
 
@@ -15,7 +15,7 @@ resource "google_compute_instance" "minecraft" {
   }
 
   network_interface {
-    subnetwork = var.existing_subnetwork_name == "" ? local.unique_resource_name : var.existing_subnetwork_name
+    subnetwork = var.existing_subnetwork_name == "" ? local.subnet_name : var.existing_subnetwork_name
 
     access_config {
       network_tier = "STANDARD"
@@ -50,7 +50,7 @@ resource "google_compute_instance" "minecraft" {
 }
 
 resource "google_compute_disk" "minecraft" {
-  name        = local.unique_resource_name
+  name        = "${local.unique_resource_name}-mcdata"
   description = "External disk to store Minecraft files"
   zone        = local.zone_name
   type        = "pd-ssd"

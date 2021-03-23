@@ -16,4 +16,4 @@ unzip -q ${mc_home_folder}/backup.zip -d ${mc_home_folder}/world
 rm -f ${mc_home_folder}/backup.zip
 
 command="${screen_cmd}" screen -S ${screen_ses} -d -m bash -c '$command; exec bash'
-echo "Restored backup. It will take a few seconds for the server to be back up."
+echo "Restored backup. It will take a few seconds for the MC server to be back up."

@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "minecraft" {
-  name          = local.unique_resource_name
+  name          = "${local.unique_resource_name}-backup"
   location      = "US"
   storage_class = "STANDARD"
 
