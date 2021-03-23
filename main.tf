@@ -15,6 +15,10 @@ terraform {
     template = {
       version = "= 2.2.0"
     }
+
+    random = {
+      version = "= 3.1.0"
+    }
   }
 
   # Just to make things easier for PoC, the state is stored locally.

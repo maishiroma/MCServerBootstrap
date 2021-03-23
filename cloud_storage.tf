@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "minecraft" {
-  name          = "${var.project_name}-backup"
+  name          = local.unique_resource_name
   location      = "US"
   storage_class = "STANDARD"
 
@@ -13,4 +13,6 @@ resource "google_storage_bucket" "minecraft" {
   }
 
   force_destroy = true
+
+  labels = local.common_labels
 }

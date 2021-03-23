@@ -1,18 +1,18 @@
 resource "google_compute_network" "minecraft" {
-  name                    = "${var.project_name}-network"
+  name                    = local.unique_resource_name
   description             = "The VPC used to host the minecraft instance"
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "minecraft" {
-  name          = "${var.project_name}-subnetwork"
+  name          = local.unique_resource_name
   network       = google_compute_network.minecraft.id
   region        = var.region
   ip_cidr_range = "10.128.0.0/9"
 }
 
 resource "google_compute_firewall" "ingress_game" {
-  name        = "${var.project_name}-ingress-game"
+  name        = local.unique_resource_name
   network     = google_compute_network.minecraft.id
   description = "Ingress traffic to instances for game trafffic"
 
@@ -29,7 +29,7 @@ resource "google_compute_firewall" "ingress_game" {
 }
 
 resource "google_compute_firewall" "ingress_admin" {
-  name        = "${var.project_name}-ingress-admin"
+  name        = local.unique_resource_name
   network     = google_compute_network.minecraft.id
   description = "Ingress traffic to instances for admin access"
 
@@ -50,7 +50,7 @@ resource "google_compute_firewall" "ingress_admin" {
 }
 
 resource "google_compute_firewall" "egress" {
-  name        = "${var.project_name}-egress"
+  name        = local.unique_resource_name
   network     = google_compute_network.minecraft.id
   description = "egress traffic from instances"
 
@@ -64,7 +64,7 @@ resource "google_compute_firewall" "egress" {
 }
 
 resource "google_compute_address" "minecraft" {
-  name        = "${var.project_name}-ext"
+  name        = local.unique_resource_name
   description = "The static IP used to access this instance extenrally"
 
   address_type = "EXTERNAL"

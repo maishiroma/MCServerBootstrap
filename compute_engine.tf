@@ -1,5 +1,5 @@
 resource "google_compute_instance" "minecraft" {
-  name         = var.project_name
+  name         = local.unique_resource_name
   machine_type = var.machine_type
   zone         = local.zone_name
 
@@ -41,15 +41,19 @@ resource "google_compute_instance" "minecraft" {
     ]
   }
 
+  labels = local.common_labels
+
   depends_on = [
     google_storage_bucket.minecraft
   ]
 }
 
 resource "google_compute_disk" "minecraft" {
-  name        = "${var.project_name}-gamedata"
+  name        = local.unique_resource_name
   description = "External disk to store Minecraft files"
   zone        = local.zone_name
   type        = "pd-ssd"
   size        = var.disk_size
+
+  labels = local.common_labels
 }
