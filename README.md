@@ -1,5 +1,5 @@
 # Minecraft Server Bootstrap in GCP
-Welcome to my small, but humble infrastructure development for a Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/) (GCP)!
+Welcome to my small, but humble Terraform Module development for a Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/) (GCP)!
 
 ![meme](https://gifimage.net/wp-content/uploads/2017/08/its-alive-gif-20.gif)
 
@@ -13,7 +13,7 @@ Welcome to my small, but humble infrastructure development for a Minecraft serve
 
 ## Overview
 
-This project helps streamlines a majority of the steps needed to take when creating a new multiplayer Minecraft Server. Below describes what this repository creates:
+This project helps streamlines a majority of the steps needed to take when creating a new multiplayer Minecraft Server. Below describes what this Terraform Module creates:
 - One GCE instance
     - Assigned the default service account that is scoped to Read Only for Compute API and Read Write to Cloud Storage.
     - Provided metadata scripts for bootstrapping and shutting down.
@@ -35,7 +35,7 @@ The overall cost to run this project varies greatly with usage and instance size
 
 1. A Google Account (GCP has a [free credit](https://cloud.google.com/free/) sytem where all acccounts can get $300 worth of usage)
 2. `terraform` CLI tool, whicch can be gotten [here](https://www.terraform.io/downloads.html)
-3. Some light knowledge of Linux, GCP
+3. Some light knowledge of Linux, GCP and Terraform
 4. Some familiarity with Minecraft server hosting
 
 ### Steps
@@ -52,7 +52,7 @@ The overall cost to run this project varies greatly with usage and instance size
 
 4. Enable the following APIs in the GCP Console:
     - `Compute Engine API` 
-5. Refer to this [example](./example) directory and configure it, keeping in mind of:
+5. Create a Terraform directoty, using this [example](./example) as a basis. Make sure to keep these in mind:
     - Change the __project name__ in `main.tf` if you are not using the project name in there.
     - Create a `terraform.tfvars` and define the following values:
         - `creds_json`
@@ -66,7 +66,7 @@ The overall cost to run this project varies greatly with usage and instance size
 
 ## Terraform Configuration Nuances
 
-While most of the configuration has verbose descriptions, there are some that are worthwhile to put here:
+While most of the configuration has verbose descriptions, there are some options that have a bit more complexity:
 
 | Terraform Variable     | Notes        |
 | :--------------------- | :----------: |
@@ -92,7 +92,7 @@ Backup, restores and restarts can be performed via the following scripts:
     - Restarts the Minecraft server (not the instance)
     - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
 
-To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI if one has that configured.
+To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
 
 ## Future Goals
 
