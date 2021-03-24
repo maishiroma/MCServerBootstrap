@@ -60,8 +60,13 @@ place_metadata_config() {
     fi
 }
 
+setup_cron() {
+    echo "${backup_cron} ${mc_script_location}/backup.sh" | crontab -
+}
+
 ## MAIN
 install_pre_req
 prepare_ssd
 place_metadata_config
+setup_cron
 setup_mc_server

@@ -88,6 +88,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | admin\_whitelist\_ips | The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
+| backup\_cron | How often will the backups run on the instance? This must be written in cron syntax. Defaults to once a week on Sats at 3AM | `string` | `0 3 * * 6` | no |
 | backup\_length | How many days will a backup last in the bucket? | `number` | `5` | no |
 | creds\_json | The absolute path to the credential file to auth to GCP. This needs to be associated with the GCP project that is being used | `string` | n/a | yes |
 | disk\_size | How big do you want the SSD disk to be? Defaults to 50 GB | `string` | `"50"` | no |
@@ -134,6 +135,7 @@ Backup, restores and restarts can be performed via the following scripts:
 - `/home/minecraft/scripts/backup.sh` (default location)
     - Pushes up current state of server to Cloud Storage Buckets.
     - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
+    - That this script will also get triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
 - `/home/minecraft/scripts/restore_backup.sh` (default location)
     - Restores the server world to the specified state
     - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBaackup`
@@ -145,7 +147,6 @@ To keep costs low, it is a good idea to stop this instance when it is not in use
 
 ## Future Goals
 
-- [] Create automated process to perform backups (cron job, ansible)
 - [] Create a process to restore backups, possibly allowing the user to see a list of all backups in bucket
 - [] Add a curated list of Minecraft versions that allows the end user to just specify the `version` instead of a URL link
 

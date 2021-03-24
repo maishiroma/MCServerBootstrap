@@ -82,6 +82,12 @@ variable "backup_length" {
   default     = 5
 }
 
+variable "backup_cron" {
+  description = "How often will the backups run on the instance? This must be written in cron syntax. Defaults to once a week on Sats at 3AM"
+  type        = string
+  default     = "0 3 * * 6"
+}
+
 #### Bootstrap Variables
 
 variable "mc_home_folder" {

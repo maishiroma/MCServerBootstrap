@@ -33,6 +33,7 @@ data "template_file" "bootstrap" {
     mc_script_location      = local.mc_script_location
     mc_server_download_link = var.mc_server_download_link
     backup_bucket           = google_storage_bucket.minecraft.name
+    backup_cron             = var.backup_cron
     instance_name           = local.instance_name
     zone_name               = local.zone_name
     backup_key              = "backup-conf"
