@@ -17,10 +17,7 @@ resource "google_compute_instance" "minecraft" {
   network_interface {
     subnetwork = var.existing_subnetwork_name == "" ? local.subnet_name : var.existing_subnetwork_name
 
-    access_config {
-      network_tier = "STANDARD"
-      nat_ip       = google_compute_address.minecraft.address
-    }
+    access_config {}
   }
 
   metadata_startup_script = data.template_file.bootstrap.rendered

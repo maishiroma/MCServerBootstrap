@@ -72,11 +72,3 @@ resource "google_compute_firewall" "egress" {
 
   destination_ranges = ["0.0.0.0/0"]
 }
-
-resource "google_compute_address" "minecraft" {
-  name        = "${local.unique_resource_name}-public"
-  description = "The static IP used to access this instance extenrally"
-
-  address_type = "EXTERNAL"
-  network_tier = "STANDARD"
-}

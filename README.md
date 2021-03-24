@@ -19,7 +19,6 @@ This project helps streamlines a majority of the steps needed to take when creat
     - Provided metadata scripts for bootstrapping and shutting down.
     - Provided SSH keys to allow access to one outside user
 - One persistent SSD to store the Minecraft Server Data
-- One Static IP
 - A custom Network with one Subnetwork
 - Firewaall rules in the network to only allow specific traffic to:
     - 22
@@ -27,7 +26,7 @@ This project helps streamlines a majority of the steps needed to take when creat
     - icmp
 - A Cloud Storage Bucket
 
-The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults (~$1 per day).
+The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults.
 
 ## How to Use
 
@@ -112,7 +111,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | Name | Description |
 |------|-------------|
 | created\_subnetwork | The name of the created subnetwork that was provisioned in this module. Can be used to provision more servers in the same network if desired |
-| server\_ip\_address | The public IP address used to access this instance |
+| server\_ip\_address | The ephimeral public IP address used to access this instance. |
 
 ### Nuances
 

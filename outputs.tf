@@ -1,6 +1,6 @@
 output "server_ip_address" {
-  description = "The public IP address used to access this instance"
-  value       = google_compute_address.minecraft.address
+  description = "The ephimeral public IP address used to access this instance."
+  value       = google_compute_instance.minecraft.network_interface[0].access_config[0].nat_ip
 }
 
 output "created_subnetwork" {
