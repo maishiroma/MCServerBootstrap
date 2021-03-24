@@ -1,13 +1,13 @@
 # Minecraft Server Bootstrap in GCP
-Welcome to my small, but humble Terraform Module development for a Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/) (GCP)!
+Welcome to my small, but humble Terraform module for a vanilla Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/)!
 
 ![meme](https://gifimage.net/wp-content/uploads/2017/08/its-alive-gif-20.gif)
 
 ## Table Of Contents
 - [Overview](#Overview)
 - [How to Use](#How-to-Use)
+- [Terraform Configuration](#Terraform-Configuration)
 - [General Server Management](#General-Server-Management)
-- [Terraform Configuration Nuances](#Terraform-Configuration-Nuances)
 - [Future Goals](#Future-Goals)
 - [Inspiration](#Inspiration)
 
@@ -27,9 +27,26 @@ This project helps streamlines a majority of the steps needed to take when creat
     - icmp
 - A Cloud Storage Bucket
 
-The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults.
+The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults (~$1 per day).
 
 ## How to Use
+
+### Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | > 0.12 |
+| google | = 3.60.0 |
+| random | = 3.1.0 |
+| template | = 2.2.0 |
+
+### Providers
+
+| Name | Version |
+|------|---------|
+| google | = 3.60.0 |
+| random | = 3.1.0 |
+| template | = 2.2.0 |
 
 ### Pre-Reqs
 
@@ -64,7 +81,39 @@ The overall cost to run this project varies greatly with usage and instance size
 7. Run `terraform plan` (should get 10 new resources created) and it it looks good, `terraform apply`
 8. Sit back for a few mins and your new Minecraft Server should be running at the `ip_address` the `terraform apply` outputs!
 
-## Terraform Configuration Nuances
+## Terraform Configuration
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| admin\_whitelist\_ips | The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
+| backup\_length | How many days will a backup last in the bucket? | `number` | `5` | no |
+| creds\_json | The absolute path to the credential file to auth to GCP. This needs to be associated with the GCP project that is being used | `string` | n/a | yes |
+| disk\_size | How big do you want the SSD disk to be? Defaults to 50 GB | `string` | `"50"` | no |
+| existing\_subnetwork\_name | An existing subnetwork to leverage placing the instances. Assumes that the firewalls in the subnetwork are already configured. | `string` | `""` | no |
+| game\_whitelist\_ips | The IPs used to connect to the Minecraft server itself through the MC client. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
+| machine\_type | The type of machine to spin up. If the instance is struggling, it might be worthwhile to use stronger machines. | `string` | `"n1-standard-2"` | no |
+| mc\_home\_folder | The location of the Minecraft server files on the instance | `string` | `"/home/minecraft"` | no |
+| mc\_server\_download\_link | The direct download link to download the server jar. Defaults to a link with 1.16.5. | `string` | `"https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"` | no |
+| project\_name | The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name. | `string` | `"mc-server-bootstrap"` | no |
+| region | The region used to place these resources. Defaults to us-west1 | `string` | `"us-west2"` | no |
+| server\_image | The boot image used on the server. Defaults to `ubuntu-1804-bionic-v20191211` | `string` | `"ubuntu-1804-bionic-v20191211"` | no |
+| server\_max\_ram | The maximum amount of RAM to allocate to the server process | `string` | `"7G"` | no |
+| server\_min\_ram | The minimum amount of RAM to allocate to the server process | `string` | `"1G"` | no |
+| server\_property\_template | The file path used to parse the server property file for the MC server. Defaults to the standard one in the module | `string` | `"./templates/server_properties.tpl"` | no |
+| ssh\_pub\_key\_file | The SSH public key file to use to connect to the instance as the user specified in ssh\_user | `string` | n/a | yes |
+| ssh\_user | The name of the user to allow to SSH into the instance | `string` | `"iamall"` | no |
+| zone\_prefix | The zone prefix used for deployments. Defaults to 'a'. | `string` | `"a"` | no |
+
+### Outputs
+
+| Name | Description |
+|------|-------------|
+| created\_subnetwork | The name of the created subnetwork that was provisioned in this module. Can be used to provision more servers in the same network if desired |
+| server\_ip\_address | The public IP address used to access this instance |
+
+### Nuances
 
 While most of the configuration has verbose descriptions, there are some options that have a bit more complexity:
 
@@ -99,7 +148,6 @@ To keep costs low, it is a good idea to stop this instance when it is not in use
 - [] Create automated process to perform backups (cron job, ansible)
 - [] Create a process to restore backups, possibly allowing the user to see a list of all backups in bucket
 - [] Add a curated list of Minecraft versions that allows the end user to just specify the `version` instead of a URL link
-- [x] Find a way to more easily set up the initial server properies, instead of being in the metadata
 
 ## Inspiration
 
