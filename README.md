@@ -8,6 +8,7 @@ Welcome to my small, but humble Terraform module for a vanilla Minecraft server,
 - [How to Use](#How-to-Use)
 - [Terraform Configuration](#Terraform-Configuration)
 - [General Server Management](#General-Server-Management)
+- [Modded Server Management](#Modded-Server-Management)
 - [Future Goals](#Future-Goals)
 - [Inspiration](#Inspiration)
 
@@ -24,7 +25,7 @@ This project helps streamlines a majority of the steps needed to take when creat
     - 22
     - 25565
     - icmp
-- A Cloud Storage Bucket
+- A Cloud Storage Bucket (Two if making a modded MC Server)
 
 The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults.
 
@@ -76,9 +77,12 @@ The overall cost to run this project varies greatly with usage and instance size
         - `game_whitelist_ips`
         - `admin_whitelist_ips`
     - (Optional) Configure the initial settings of the `server.properties` in the `server_properties.tpl`
+    - (Optional) Toggle if this server is a modded one or not via `is_modded`.
 6. Run `terraform init`
 7. Run `terraform plan` (should get 10 new resources created) and it it looks good, `terraform apply`
 8. Sit back for a few mins and your new Minecraft Server should be running at the `ip_address` the `terraform apply` outputs!
+
+> If one made `is_modded = true`, there are a few additonal steps needed to be done. Refer to [Modded Server Management](#Modded-Server-Management) for those steps.
 
 ## Terraform Configuration
 
@@ -93,8 +97,10 @@ The overall cost to run this project varies greatly with usage and instance size
 | disk\_size | How big do you want the SSD disk to be? Defaults to 50 GB | `string` | `"50"` | no |
 | existing\_subnetwork\_name | An existing subnetwork to leverage placing the instances. Assumes that the firewalls in the subnetwork are already configured. | `string` | `""` | no |
 | game\_whitelist\_ips | The IPs used to connect to the Minecraft server itself through the MC client. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
+| is\_modded | Is this Minecraft server modded? Defaults to false. | `bool` | false |
 | machine\_type | The type of machine to spin up. If the instance is struggling, it might be worthwhile to use stronger machines. | `string` | `"n1-standard-2"` | no |
 | mc\_home\_folder | The location of the Minecraft server files on the instance | `string` | `"/home/minecraft"` | no |
+| mc\_forge\_server\_download\_link | The direct download link to MC forge for modding support. Defaults to version 1.16.5. | `string` | "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.1.0/forge-1.16.5-36.1.0-installer.jar"
 | mc\_server\_download\_link | The direct download link to download the server jar. Defaults to a link with 1.16.5. | `string` | `"https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"` | no |
 | project\_name | The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name. | `string` | `"mc-server-bootstrap"` | no |
 | region | The region used to place these resources. Defaults to us-west1 | `string` | `"us-west2"` | no |
@@ -111,6 +117,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | Name | Description |
 |------|-------------|
 | created\_subnetwork | The name of the created subnetwork that was provisioned in this module. Can be used to provision more servers in the same network if desired |
+| ext\_bucket\_name | The name of the Cloud Storage Bucket used to hold any persistent MC data. |
 | server\_ip\_address | The ephimeral public IP address used to access this instance. |
 
 ### Nuances
@@ -123,6 +130,7 @@ While most of the configuration has verbose descriptions, there are some options
 | `game_whitelist_ips`           | To ban/allow players into the game, it is handled on the infrastructure level. As such, make sure to get your friend's IPs and place them in here, so they can acces this instance! |
 | `admin_whitelist_ips` | This should only be restricted to the person that is administrating this server. Not correlated to `admin` power in Minecraft; this is moreso system admin access |
 | `mc_server_download_link` | One easy way to get different versions of Minecraft can be gotten at [this](https://mcversions.net/) link. Just find the right server version, right click on the download URL and save it, placing it in this value. |
+|`mc_forge_server_download_link` | There are a multitude of mod loaders for MC, which would make this project rise in complexity. For simplicity sake, the project supports [MC Forge](https://files.minecraftforge.net/) as the mod loader of choice. Any other one is not supported. |
 | `server_property_template` | This could change consistenty in the server, making it tricky to keep track of in this code. As such, any new changes made after the initial deployment of the server will __NOT__ be reflected in code. To use a new config if one changed it outside of the server, one must manually go onto the instance and edit the config to match what is down in code. |
 | `existing_subnetwork_name` | This allows for multiple instances of this module to be deployed in the same network, for easier management. To properly use this, make sure one module of this stack is deployed, with the other module calls referencing the `created_subnetwork` output of the first module. |
 
@@ -143,6 +151,29 @@ Backup, restores and restarts can be performed via the following scripts:
     - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
 
 To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
+
+## Modded Server Management
+
+Along with all of the features/scripts mentioned in the [General Server Management](#General-Server-Management), there are a few extra steps that need to happen before the server is completly ready.
+
+### Extra Steps
+1. Once the server is done bootstrapping (easiest is to tail the logs for the MC server in `/home/minecraft/logs`), placce the mods that you want to use in the provided Cloud Storage Bucket (should have the suffix, `ext` at the end.)
+    - Make sure these mods are placed in the `mod` prefix in the bucket (i.e. `bucketName/mods/modName.jar`)
+2. SSH into the server and navigate to the `scripts` directory (defaults at `/home/minecraft/scripts`) and run the following script:
+
+```
+sudo ./mod_refresh.sh
+```
+
+3. Once that is done, wait for a few moments as the MC server restarts up.
+
+> For the mods to show up on player's screen, they **all** need to have that mod installed (unless it is a server side mod)!
+
+### Extra Scripts
+As mentioned previously, all modded servers have an additional script located in the `script` directory:
+-  `/home/minecraft/scripts/mod_refresh.sh` (default location)
+    - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
+    - ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
 
 ## Future Goals
 
