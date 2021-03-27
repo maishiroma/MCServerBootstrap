@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 # This will run during initial launch and relaunches of the instance (i.e. when it is destroyed)
 # All variables in here are interpolated into Terraform
@@ -33,7 +34,19 @@ install_pre_req() {
 setup_mc_server() {
     cd ${mc_home_folder}
     if [ ! -f "${mc_home_folder}/${jar_name}" ]; then
-        wget -O ${mc_home_folder}/${jar_name} ${mc_server_download_link}
+        if [ "${is_modded}" == "true" ]; then             
+            installer_name=$(basename ${mc_server_download_link})
+            result_name=$${installer_name/-installer/}
+            
+            wget -O ${mc_home_folder}/$${installer_name} ${mc_server_download_link}
+            java -jar ${mc_home_folder}/$${installer_name} --installServer
+            
+            rm -f ${mc_home_folder}/$${installer_name}
+            mv -f ${mc_home_folder}/$${result_name} ${mc_home_folder}/${jar_name}
+
+        else
+            wget -O ${mc_home_folder}/${jar_name} ${mc_server_download_link}
+        fi
 
         set +e
         ${screen_cmd}
@@ -53,6 +66,11 @@ place_metadata_config() {
     chmod 755 ${mc_script_location}/backup.sh
     chmod 755 ${mc_script_location}/restore_backup.sh
     chmod 755 ${mc_script_location}/restart.sh
+
+    if [ "${is_modded}" == "true" ]; then
+        gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${mod_refresh_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/mod_refresh.sh
+        chmod 755 ${mc_script_location}/mod_refresh.sh
+    fi
 
     if [ ! -f "${mc_home_folder}/server.properties" ]; then
         gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${mc_server_prop_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_home_folder}/server.properties
