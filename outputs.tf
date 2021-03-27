@@ -7,3 +7,8 @@ output "created_subnetwork" {
   description = "The name of the created subnetwork that was provisioned in this module. Can be used to provision more servers in the same network if desired"
   value       = google_compute_subnetwork.minecraft.*.name
 }
+
+output "ext_bucket_name" {
+  description = "The name of the Cloud Storage Bucket used to hold any persistent MC data."
+  value       = google_storage_bucket.minecraft_pre_reqs.*.name
+}

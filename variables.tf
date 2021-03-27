@@ -102,6 +102,12 @@ variable "mc_server_download_link" {
   default     = "https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"
 }
 
+variable "mc_forge_server_download_link" {
+  description = "The direct download link to MC forge for modding support. Defaults to version 1.16.5."
+  type        = string
+  default     = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.1.0/forge-1.16.5-36.1.0-installer.jar"
+}
+
 variable "server_min_ram" {
   description = "The minimum amount of RAM to allocate to the server process"
   type        = string
@@ -118,4 +124,10 @@ variable "server_property_template" {
   description = "The file path used to parse the server property file for the MC server. Defaults to the standard one in the module"
   type        = string
   default     = "./templates/server_properties.tpl"
+}
+
+variable "is_modded" {
+  description = "Is this Minecraft server modded? Defaults to false."
+  type        = bool
+  default     = false
 }

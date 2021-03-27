@@ -34,3 +34,22 @@ module "mc_bootstrap" {
 #  server_property_template = var.server_property_template
 #  existing_subnetwork_name = module.mc_bootstrap.created_subnetwork[0]
 #}
+
+# Example of a modded server
+#module "mc_bootstrap_modded" {
+#  # For using this outside of this repo, make sure to specify the source in a git URL
+#  source = "../"
+#
+#  # General Variables
+#  region           = var.region
+#  creds_json       = var.creds_json
+#  ssh_pub_key_file = var.ssh_pub_key_file
+#
+#  # Network Variables
+#  game_whitelist_ips  = var.game_whitelist_ips
+#  admin_whitelist_ips = var.admin_whitelist_ips
+#
+#  # Minecraft Variables
+#  server_property_template = var.server_property_template
+#  is_modded                = true
+#}

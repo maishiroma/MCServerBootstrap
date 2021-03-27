@@ -13,6 +13,7 @@ locals {
   common_labels = {
     project   = var.project_name
     terraform = "true"
+    is_modded = var.is_modded
   }
 }
 
@@ -26,19 +27,22 @@ data "template_file" "bootstrap" {
   template = file("${path.module}/templates/bootstrap.tpl")
 
   vars = {
+    is_modded               = var.is_modded
     jar_name                = local.jar_name
     screen_ses              = local.screen_ses
     screen_cmd              = local.screen_cmd
     mc_home_folder          = var.mc_home_folder
     mc_script_location      = local.mc_script_location
-    mc_server_download_link = var.mc_server_download_link
+    mc_server_download_link = var.is_modded == false ? var.mc_server_download_link : var.mc_forge_server_download_link
     backup_bucket           = google_storage_bucket.minecraft.name
+    ext_bucket              = var.is_modded == false ? "" : "${local.unique_resource_name}-ext-data"
     backup_cron             = var.backup_cron
     instance_name           = local.instance_name
     zone_name               = local.zone_name
     backup_key              = "backup-conf"
     restore_key             = "restore-conf"
     restart_key             = "restart-conf"
+    mod_refresh_key         = "mod-conf"
     mc_server_prop_key      = "mc-conf"
   }
 }
@@ -65,7 +69,6 @@ data "template_file" "restore_backup_script" {
   template = file("${path.module}/templates/restore_backup.tpl")
 
   vars = {
-    jar_name       = local.jar_name
     screen_ses     = local.screen_ses
     screen_cmd     = local.screen_cmd
     mc_home_folder = var.mc_home_folder
@@ -77,11 +80,20 @@ data "template_file" "restart_script" {
   template = file("${path.module}/templates/restart.tpl")
 
   vars = {
-    jar_name       = local.jar_name
     screen_ses     = local.screen_ses
     screen_cmd     = local.screen_cmd
     mc_home_folder = var.mc_home_folder
-    backup_bucket  = google_storage_bucket.minecraft.name
+  }
+}
+
+data "template_file" "mod_refresh_script" {
+  template = file("${path.module}/templates/mod_refresh.tpl")
+
+  vars = {
+    screen_ses     = local.screen_ses
+    screen_cmd     = local.screen_cmd
+    mc_home_folder = var.mc_home_folder
+    ext_bucket     = var.is_modded == false ? "" : "${local.unique_resource_name}-ext-data"
   }
 }
 

@@ -16,3 +16,15 @@ resource "google_storage_bucket" "minecraft" {
 
   labels = local.common_labels
 }
+
+resource "google_storage_bucket" "minecraft_pre_reqs" {
+  count = var.is_modded == true ? 1 : 0
+
+  name          = "${local.unique_resource_name}-ext-data"
+  location      = "US"
+  storage_class = "STANDARD"
+
+  force_destroy = true
+
+  labels = local.common_labels
+}
