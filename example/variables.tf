@@ -17,3 +17,5 @@ variable "admin_whitelist_ips" {}
 variable "server_property_template" {
   default = "./custom_templates/server_properties.tpl"
 }
+
+variable "backup_length" {}

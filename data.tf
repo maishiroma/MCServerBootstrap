@@ -6,6 +6,7 @@ locals {
   instance_name = "${local.unique_resource_name}-ins"
 
   mc_script_location = "${var.mc_home_folder}/scripts"
+  mount_location     = "/dev/sdb"
   jar_name           = "server.jar"
   screen_ses         = "mc_server"
   screen_cmd         = "java -Xms${var.server_min_ram} -Xmx${var.server_max_ram} -jar ${var.mc_home_folder}/${local.jar_name} nogui"
@@ -27,6 +28,7 @@ data "template_file" "bootstrap" {
   template = file("${path.module}/templates/bootstrap.tpl")
 
   vars = {
+    mount_location          = local.mount_location
     is_modded               = var.is_modded
     jar_name                = local.jar_name
     screen_ses              = local.screen_ses

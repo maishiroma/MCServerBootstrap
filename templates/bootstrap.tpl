@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 
 # This will run during initial launch and relaunches of the instance (i.e. when it is destroyed)
 # All variables in here are interpolated into Terraform
@@ -10,11 +9,14 @@ prepare_ssd() {
         mkdir ${mc_home_folder}
     fi
 
-    if [ "$(blkid -o value --match-tag TYPE /dev/sdb)" != "ext4" ]; then
-        mkfs -t ext4 /dev/sdb
+    if [ "$(blkid -o value --match-tag TYPE ${mount_location})" != "ext4" ]; then
+        mkfs -t ext4 ${mount_location}
     fi
-    mount -t ext4 /dev/sdb ${mc_home_folder}
     
+    if [ $(mount | grep -c ${mount_location}) != 1 ]; then
+        mount -t ext4 ${mount_location} ${mc_home_folder}
+    fi
+
     if [ ! -d "${mc_script_location}" ]; then
         mkdir ${mc_script_location}
     fi
