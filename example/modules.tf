@@ -14,7 +14,6 @@ module "mc_bootstrap" {
 
   # Minecraft Variables
   server_property_template = var.server_property_template
-  backup_length            = var.backup_length
 }
 
 # An example of how one would make multiple MC servers, using the subnetwork output of the first module.
