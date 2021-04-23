@@ -144,8 +144,9 @@ Backup, restores and restarts can be performed via the following scripts:
     - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
     - That this script will also get triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
 - `/home/minecraft/scripts/restore_backup.sh` (default location)
-    - Restores the server world to the specified state
-    - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBaackup`
+    - Restores the server world to the specified state (either by specifying a named backup or selecting one from the script)
+        - Ex 1: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
+        - Ex 2: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh`
 - `/home/minecraft/scripts/restart.sh` (default location)
     - Restarts the Minecraft server (not the instance)
     - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
@@ -174,11 +175,6 @@ As mentioned previously, all modded servers have an additional script located in
 -  `/home/minecraft/scripts/mod_refresh.sh` (default location)
     - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
     - ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
-
-## Future Goals
-
-- [] Create a process to restore backups, possibly allowing the user to see a list of all backups in bucket
-- [] Add a curated list of Minecraft versions that allows the end user to just specify the `version` instead of a URL link
 
 ## Inspiration
 
