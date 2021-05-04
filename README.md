@@ -9,6 +9,7 @@ Welcome to my small, but humble Terraform module for a vanilla Minecraft server,
 - [Terraform Configuration](#Terraform-Configuration)
 - [General Server Management](#General-Server-Management)
 - [Modded Server Management](#Modded-Server-Management)
+- [Troubleshooting](#Troubleshooting)
 - [Future Goals](#Future-Goals)
 - [Inspiration](#Inspiration)
 
@@ -68,7 +69,7 @@ The overall cost to run this project varies greatly with usage and instance size
 > Be careful with that key! __It has admin API access to your entire GCP account__, meaning anything can be deployed in GCP using said key. More savy GCP users can use a role that is less wide in scope for this project, but for the sake of this walkthrough, you can proceed with these permissions.
 
 4. Enable the following APIs in the GCP Console:
-    - `Compute Engine API` 
+    - `Compute Engine API`
 5. Create a Terraform directoty, using this [example](./example) as a basis. Make sure to keep these in mind:
     - Change the __project name__ in `main.tf` if you are not using the project name in there.
     - Create a `terraform.tfvars` and define the following values:
@@ -136,20 +137,27 @@ While most of the configuration has verbose descriptions, there are some options
 
 ## General Server Management
 
-By default, rebooting and respinning up an instance will automatically set up the server for you. No need for any action on you!
+By default, rebooting and respinning up an instance will automatically set up the Minecraft Server for you. No need for any action on your part!
 
-Backup, restores and restarts can be performed via the following scripts:
-- `/home/minecraft/scripts/backup.sh` (default location)
-    - Pushes up current state of server to Cloud Storage Buckets.
-    - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
-    - That this script will also get triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
-- `/home/minecraft/scripts/restore_backup.sh` (default location)
-    - Restores the server world to the specified state (either by specifying a named backup or selecting one from the script)
-        - Ex 1: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
-        - Ex 2: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh`
-- `/home/minecraft/scripts/restart.sh` (default location)
-    - Restarts the Minecraft server (not the instance)
-    - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
+However, if needed, the following server actions can be performed:
+- **Stopping the Server**
+    - `/home/minecraft/scripts/stop.sh` (default location)
+        - Stops the Minecraft server (not the instance)
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./stop.sh`
+        - To start up the Minecraft server again, run the `restart.sh` script
+- **Restarting the Server**
+    - `/home/minecraft/scripts/restart.sh` (default location)
+        - Restarts the Minecraft server (not the instance)
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
+- **Backup World**
+    - `/home/minecraft/scripts/backup.sh` (default location)
+        - Pushes up current state of server to Cloud Storage Buckets.
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
+        - This script will also be triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
+- **Restore To Backup**
+    - `/home/minecraft/scripts/restore_backup.sh` (default location)
+        - Restores the server world to the specified state
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
 
 To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
 
@@ -172,9 +180,31 @@ sudo ./mod_refresh.sh
 
 ### Extra Scripts
 As mentioned previously, all modded servers have an additional script located in the `script` directory:
--  `/home/minecraft/scripts/mod_refresh.sh` (default location)
-    - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
-    - ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
+- **Syncronize Mods**
+    - `/home/minecraft/scripts/mod_refresh.sh` (default location)
+        - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
+
+## Troubleshooting
+- *Problem*: The server has not been started, even though the instance has been respun/started!
+    - **Resolution**: It could be the startup script failed to execute. Taint the GCP instance in Terraform and reapply the Terraform configuration to auto respin the instance and wait for the instance to spin up again.
+- *Problem*: I'm not sure if the startup script executed?
+    - **Resolution**: Depending on the image you are using, there is a way to tell the instance to rerun the starup script. Refer to the link [here](https://cloud.google.com/compute/docs/startupscript#rerunthescript) for more details.
+- *Problem*: I want to debug the running instance, what are my options?
+    - **Resolution**: Check this [link](https://cloud.google.com/compute/docs/startupscript#viewing_startup_script_logs) to view any startup script logs. For the minecraft server itself, the logs can be viewed in the minecraft folder under `logs`.
+- *Problem*: Looking on the instance's logs, there's a crash in the Minecraft server, how can I fix this?
+    - **Resolution**: The following solutions should be attempted in order from top to bottom, stopping once a resolution has been found:
+        - Run the `restart.sh` script in the `scripts` folder to restart the Minecraft server
+        - Reboot the instance (`sudo reboot`) or recreate the instance in Terraform
+        - Restore from a backup using `restore_backup.sh`
+- *Problem*: I need to start my world from scratch, what can I do?
+    - **Resolution**: From least to most destructive, you have the following options (make sure to stop the minecraft server first via `stop.sh`!):
+        - Delete the `world` folder and run `restart.sh` to start up the server again
+        - Remove all contents of the `minecraft` folder and rerun the startup script
+        - Perform a `terraform destroy` and then a `terraform apply`
+
+## Future Goals
+- [ ] Create a Cloud Function that will allow for anyone authenticated to auto start and stop the server.
 
 ## Inspiration
 
