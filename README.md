@@ -137,20 +137,27 @@ While most of the configuration has verbose descriptions, there are some options
 
 ## General Server Management
 
-By default, rebooting and respinning up an instance will automatically set up the server for you. No need for any action on you!
+By default, rebooting and respinning up an instance will automatically set up the Minecraft Server for you. No need for any action on your part!
 
-Backup, restores and restarts can be performed via the following scripts:
-- `/home/minecraft/scripts/backup.sh` (default location)
-    - Pushes up current state of server to Cloud Storage Buckets.
-    - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
-    - That this script will also get triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
-- `/home/minecraft/scripts/restore_backup.sh` (default location)
-    - Restores the server world to the specified state (either by specifying a named backup or selecting one from the script)
-        - Ex 1: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
-        - Ex 2: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh`
-- `/home/minecraft/scripts/restart.sh` (default location)
-    - Restarts the Minecraft server (not the instance)
-    - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
+However, if needed, the following server actions can be performed:
+- **Stopping the Server**
+    - `/home/minecraft/scripts/stop.sh` (default location)
+        - Stops the Minecraft server (not the instance)
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./stop.sh`
+        - To start up the Minecraft server again, run the `restart.sh` script
+- **Restarting the Server**
+    - `/home/minecraft/scripts/restart.sh` (default location)
+        - Restarts the Minecraft server (not the instance)
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./restart.sh`
+- **Backup World**
+    - `/home/minecraft/scripts/backup.sh` (default location)
+        - Pushes up current state of server to Cloud Storage Buckets.
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./backup.sh`
+        - This script will also be triggered automatically by a cronjob. By default it runs once a week on Sat at 3AM.
+- **Restore To Backup**
+    - `/home/minecraft/scripts/restore_backup.sh` (default location)
+        - Restores the server world to the specified state
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
 
 To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
 
@@ -173,9 +180,10 @@ sudo ./mod_refresh.sh
 
 ### Extra Scripts
 As mentioned previously, all modded servers have an additional script located in the `script` directory:
-- `/home/minecraft/scripts/mod_refresh.sh` (default location)
-    - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
-    - ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
+- **Syncronize Mods**
+    - `/home/minecraft/scripts/mod_refresh.sh` (default location)
+        - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
+            - Ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
 
 ## Troubleshooting
 - *Problem*: The server has not been started, even though the instance has been respun/started!
@@ -185,9 +193,12 @@ As mentioned previously, all modded servers have an additional script located in
 - *Problem*: I want to debug the running instance, what are my options?
     - **Resolution**: Check this [link](https://cloud.google.com/compute/docs/startupscript#viewing_startup_script_logs) to view any startup script logs. For the minecraft server itself, the logs can be viewed in the minecraft folder under `logs`.
 - *Problem*: Looking on the instance's logs, there's a crash in the Minecraft server, how can I fix this?
-    - **Resolution**: First run the `restart.sh` script in the `scripts` folder to see if restarting fixes the problem. If that does not work, try rebooting the instance or recreate the instance. If all else fails, try to load from a backup world using the `restore_backup.sh` script.
+    - **Resolution**: The following solutions should be attempted in order from top to bottom, stopping once a resolution has been found:
+        - Run the `restart.sh` script in the `scripts` folder to restart the Minecraft server
+        - Reboot the instance (`sudo reboot`) or recreate the instance in Terraform
+        - Restore from a backup using `restore_backup.sh`
 - *Problem*: I need to start my world from scratch, what can I do?
-    - **Resolution**: From least to most destructive, you have the following options (make sure to manually stop the minecraft server first!):
+    - **Resolution**: From least to most destructive, you have the following options (make sure to stop the minecraft server first via `stop.sh`!):
         - Delete the `world` folder and run `restart.sh` to start up the server again
         - Remove all contents of the `minecraft` folder and rerun the startup script
         - Perform a `terraform destroy` and then a `terraform apply`

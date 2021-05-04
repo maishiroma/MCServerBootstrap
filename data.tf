@@ -44,6 +44,7 @@ data "template_file" "bootstrap" {
     backup_key              = "backup-conf"
     restore_key             = "restore-conf"
     restart_key             = "restart-conf"
+    stop_key                = "stop-conf"
     mod_refresh_key         = "mod-conf"
     mc_server_prop_key      = "mc-conf"
   }
@@ -84,6 +85,15 @@ data "template_file" "restart_script" {
   vars = {
     screen_ses     = local.screen_ses
     screen_cmd     = local.screen_cmd
+    mc_home_folder = var.mc_home_folder
+  }
+}
+
+data "template_file" "stop_script" {
+  template = file("${path.module}/templates/stop.tpl")
+
+  vars = {
+    screen_ses     = local.screen_ses
     mc_home_folder = var.mc_home_folder
   }
 }

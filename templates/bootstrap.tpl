@@ -67,10 +67,12 @@ setup_mc_server() {
 }
 
 place_metadata_config() {
+    gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${stop_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/stop.sh
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${backup_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/backup.sh
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${restore_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/restore_backup.sh
     gcloud compute instances describe ${instance_name} --zone ${zone_name} --flatten="metadata[${restart_key}]" | tail -n +2 - | awk '{$1=$1;print}' > ${mc_script_location}/restart.sh
 
+    chmod 755 ${mc_script_location}/stop.sh
     chmod 755 ${mc_script_location}/backup.sh
     chmod 755 ${mc_script_location}/restore_backup.sh
     chmod 755 ${mc_script_location}/restart.sh
