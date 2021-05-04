@@ -9,6 +9,7 @@ Welcome to my small, but humble Terraform module for a vanilla Minecraft server,
 - [Terraform Configuration](#Terraform-Configuration)
 - [General Server Management](#General-Server-Management)
 - [Modded Server Management](#Modded-Server-Management)
+- [Troubleshooting](#Troubleshooting)
 - [Future Goals](#Future-Goals)
 - [Inspiration](#Inspiration)
 
@@ -68,7 +69,7 @@ The overall cost to run this project varies greatly with usage and instance size
 > Be careful with that key! __It has admin API access to your entire GCP account__, meaning anything can be deployed in GCP using said key. More savy GCP users can use a role that is less wide in scope for this project, but for the sake of this walkthrough, you can proceed with these permissions.
 
 4. Enable the following APIs in the GCP Console:
-    - `Compute Engine API` 
+    - `Compute Engine API`
 5. Create a Terraform directoty, using this [example](./example) as a basis. Make sure to keep these in mind:
     - Change the __project name__ in `main.tf` if you are not using the project name in there.
     - Create a `terraform.tfvars` and define the following values:
@@ -172,9 +173,27 @@ sudo ./mod_refresh.sh
 
 ### Extra Scripts
 As mentioned previously, all modded servers have an additional script located in the `script` directory:
--  `/home/minecraft/scripts/mod_refresh.sh` (default location)
+- `/home/minecraft/scripts/mod_refresh.sh` (default location)
     - Syncs up the `mods` folder on the instance to match the current state of the Cloud Storage Bucket holding said mods.
     - ex: `$ cd /home/minecraft/scripts && sudo ./mod_refresh.sh`
+
+## Troubleshooting
+- *Problem*: The server has not been started, even though the instance has been respun/started!
+    - **Resolution**: It could be the startup script failed to execute. Taint the GCP instance in Terraform and reapply the Terraform configuration to auto respin the instance and wait for the instance to spin up again.
+- *Problem*: I'm not sure if the startup script executed?
+    - **Resolution**: Depending on the image you are using, there is a way to tell the instance to rerun the starup script. Refer to the link [here](https://cloud.google.com/compute/docs/startupscript#rerunthescript) for more details.
+- *Problem*: I want to debug the running instance, what are my options?
+    - **Resolution**: Check this [link](https://cloud.google.com/compute/docs/startupscript#viewing_startup_script_logs) to view any startup script logs. For the minecraft server itself, the logs can be viewed in the minecraft folder under `logs`.
+- *Problem*: Looking on the instance's logs, there's a crash in the Minecraft server, how can I fix this?
+    - **Resolution**: First run the `restart.sh` script in the `scripts` folder to see if restarting fixes the problem. If that does not work, try rebooting the instance or recreate the instance. If all else fails, try to load from a backup world using the `restore_backup.sh` script.
+- *Problem*: I need to start my world from scratch, what can I do?
+    - **Resolution**: From least to most destructive, you have the following options (make sure to manually stop the minecraft server first!):
+        - Delete the `world` folder and run `restart.sh` to start up the server again
+        - Remove all contents of the `minecraft` folder and rerun the startup script
+        - Perform a `terraform destroy` and then a `terraform apply`
+
+## Future Goals
+- [ ] Create a Cloud Function that will allow for anyone authenticated to auto start and stop the server.
 
 ## Inspiration
 
