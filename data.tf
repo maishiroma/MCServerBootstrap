@@ -9,7 +9,8 @@ locals {
   mount_location     = "/dev/sdb"
   jar_name           = "server.jar"
   screen_ses         = "mc_server"
-  screen_cmd         = "java -Xms${var.server_min_ram} -Xmx${var.server_max_ram} -jar ${var.mc_home_folder}/${local.jar_name} nogui"
+
+  screen_cmd = var.override_server_activate_cmd == "" ? "java -Xms${var.server_min_ram} -Xmx${var.server_max_ram} -jar ${var.mc_home_folder}/${local.jar_name} nogui" : var.override_server_activate_cmd
 
   common_labels = {
     project   = var.project_name
@@ -41,6 +42,8 @@ data "template_file" "bootstrap" {
     backup_cron             = var.backup_cron
     instance_name           = local.instance_name
     zone_name               = local.zone_name
+    min_ram                 = var.server_min_ram
+    max_ram                 = var.server_max_ram
     backup_key              = "backup-conf"
     restore_key             = "restore-conf"
     restart_key             = "restart-conf"

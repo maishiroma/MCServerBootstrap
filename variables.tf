@@ -131,3 +131,9 @@ variable "is_modded" {
   type        = bool
   default     = false
 }
+
+variable "override_server_activate_cmd" {
+  description = "Should the bootstrap use a different server command than java -Xms server_min_ram -Xmx server_max_ram -jar /home/minecraft/server.jar nogui? If left blank, uses said default command"
+  type        = string
+  default     = ""
+}
