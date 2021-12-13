@@ -23,8 +23,9 @@ prepare_ssd() {
 }
 
 install_pre_req() {
+    add-apt-repository -y ppa:openjdk-r/ppa 
     apt-get update
-    apt-get install -y default-jre-headless zip unzip screen less
+    apt-get install -y default-jre-headless openjdk-17-jdk zip unzip screen less
     
     if [ $(command -v gsutil &> /dev/null)  ]; then
         echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -37,7 +38,7 @@ install_pre_req() {
 
 setup_mc_server() {
     cd ${mc_home_folder}
-    if [ ! -f "${mc_home_folder}/${jar_name}" ]; then
+    if [ ! -f "${mc_home_folder}/eula.txt" ]; then
         if [ "${is_modded}" == "true" ]; then             
             installer_name=$(basename ${mc_server_download_link})
             result_name=$${installer_name/-installer/}
@@ -46,8 +47,13 @@ setup_mc_server() {
             java -jar ${mc_home_folder}/$${installer_name} --installServer
             
             rm -f ${mc_home_folder}/$${installer_name}
-            mv -f ${mc_home_folder}/$${result_name} ${mc_home_folder}/${jar_name}
-
+            if [ ! -f "${mc_home_folder}/user_jvm_args.txt" ]; then
+                mv -f ${mc_home_folder}/$${result_name} ${mc_home_folder}/${jar_name}
+            else
+                echo "" >> ${mc_home_folder}/user_jvm_args.txt
+                echo "-Xms${min_ram}" >> ${mc_home_folder}/user_jvm_args.txt
+                echo "-Xmx${max_ram}" >> ${mc_home_folder}/user_jvm_args.txt
+            fi
         else
             wget -O ${mc_home_folder}/${jar_name} ${mc_server_download_link}
         fi

@@ -103,6 +103,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | mc\_home\_folder | The location of the Minecraft server files on the instance | `string` | `"/home/minecraft"` | no |
 | mc\_forge\_server\_download\_link | The direct download link to MC forge for modding support. Defaults to version 1.16.5. | `string` | "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.1.0/forge-1.16.5-36.1.0-installer.jar"
 | mc\_server\_download\_link | The direct download link to download the server jar. Defaults to a link with 1.16.5. | `string` | `"https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"` | no |
+| override\_server\_activate\_cmd | Should the bootstrap use a different server command than java -Xms server_min_ram -Xmx server_max_ram -jar /home/minecraft/server.jar nogui? If left blank, uses said default command | `string` | "" | no
 | project\_name | The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name. | `string` | `"mc-server-bootstrap"` | no |
 | region | The region used to place these resources. Defaults to us-west1 | `string` | `"us-west2"` | no |
 | server\_image | The boot image used on the server. Defaults to `ubuntu-1804-bionic-v20191211` | `string` | `"ubuntu-1804-bionic-v20191211"` | no |
@@ -134,6 +135,7 @@ While most of the configuration has verbose descriptions, there are some options
 |`mc_forge_server_download_link` | There are a multitude of mod loaders for MC, which would make this project rise in complexity. For simplicity sake, the project supports [MC Forge](https://files.minecraftforge.net/) as the mod loader of choice. Any other one is not supported. |
 | `server_property_template` | This could change consistenty in the server, making it tricky to keep track of in this code. As such, any new changes made after the initial deployment of the server will __NOT__ be reflected in code. To use a new config if one changed it outside of the server, one must manually go onto the instance and edit the config to match what is down in code. |
 | `existing_subnetwork_name` | This allows for multiple instances of this module to be deployed in the same network, for easier management. To properly use this, make sure one module of this stack is deployed, with the other module calls referencing the `created_subnetwork` output of the first module. |
+| `override_server_activate_cmd` | There is a slight change in the logic for bootstrapping Forge in 1.18, specifically with the nonexistance of the server jar to run after installing Forge. Instead, they change running the command to just a bash script, `run.sh`. This needs to be reflected in the command, hence this variable. |
 
 ## General Server Management
 
