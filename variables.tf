@@ -137,3 +137,9 @@ variable "override_server_activate_cmd" {
   type        = string
   default     = ""
 }
+
+variable "server_world_name" {
+  description = "The name of the world that the server will be using. By default, this is just world."
+  type        = string
+  default     = "world"
+}

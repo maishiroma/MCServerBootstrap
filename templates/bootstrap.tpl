@@ -53,6 +53,7 @@ setup_mc_server() {
                 echo "" >> ${mc_home_folder}/user_jvm_args.txt
                 echo "-Xms${min_ram}" >> ${mc_home_folder}/user_jvm_args.txt
                 echo "-Xmx${max_ram}" >> ${mc_home_folder}/user_jvm_args.txt
+                echo "-XX:+UseG1GC" >> ${mc_home_folder}/user_jvm_args.txt
             fi
         else
             wget -O ${mc_home_folder}/${jar_name} ${mc_server_download_link}
@@ -65,6 +66,16 @@ setup_mc_server() {
         fi
 
         sed -i 's/eula=false/eula=true/g' ${mc_home_folder}/eula.txt
+    else
+        if [ -f "${mc_home_folder}/user_jvm_args.txt" ]; then
+            head -n 9 ${mc_home_folder}/user_jvm_args.txt > ${mc_home_folder}/temp.txt
+            mv -f ${mc_home_folder}/temp.txt ${mc_home_folder}/user_jvm_args.txt
+
+            echo "" >> ${mc_home_folder}/user_jvm_args.txt
+            echo "-Xms${min_ram}" >> ${mc_home_folder}/user_jvm_args.txt
+            echo "-Xmx${max_ram}" >> ${mc_home_folder}/user_jvm_args.txt
+            echo "-XX:+UseG1GC" >> ${mc_home_folder}/user_jvm_args.txt
+        fi
     fi
 
     if ! screen -list | grep -q "${screen_ses}"; then

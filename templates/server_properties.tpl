@@ -1,4 +1,4 @@
-#Minecraft server properties
+# Minecraft server properties
 enable-jmx-monitoring=false
 rcon.port=25575
 level-seed=
@@ -6,7 +6,7 @@ gamemode=survival
 enable-command-block=false
 enable-query=false
 generator-settings=
-level-name=world
+level-name=${world_name}
 motd=A Minecraft Server
 query.port=25565
 pvp=true

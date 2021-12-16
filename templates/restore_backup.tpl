@@ -9,10 +9,10 @@ echo "Stopping MC Server..."
 sleep 10
 screen -S ${screen_ses} -p 0 -X quit
 
-mv -f ${mc_home_folder}/world ${mc_home_folder}/world_old
+mv -f ${mc_home_folder}/${world_name} ${mc_home_folder}/${world_name}_old
 gsutil cp gs://${backup_bucket}/$1 ${mc_home_folder}/backup.zip
-mkdir ${mc_home_folder}/world
-unzip -q ${mc_home_folder}/backup.zip -d ${mc_home_folder}/world
+mkdir ${mc_home_folder}/${world_name}
+unzip -q ${mc_home_folder}/backup.zip -d ${mc_home_folder}/${world_name}
 rm -f ${mc_home_folder}/backup.zip
 
 command="${screen_cmd}" screen -S ${screen_ses} -d -m bash -c '$command; exec bash'
