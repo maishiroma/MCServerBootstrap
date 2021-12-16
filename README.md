@@ -110,6 +110,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | server\_max\_ram | The maximum amount of RAM to allocate to the server process | `string` | `"7G"` | no |
 | server\_min\_ram | The minimum amount of RAM to allocate to the server process | `string` | `"1G"` | no |
 | server\_property\_template | The file path used to parse the server property file for the MC server. Defaults to the standard one in the module | `string` | `"./templates/server_properties.tpl"` | no |
+| server\_world\_name | The name of the world that the server will be using. By default, this is just world. | `string` | `"world"` | no |
 | ssh\_pub\_key\_file | The SSH public key file to use to connect to the instance as the user specified in ssh\_user | `string` | n/a | yes |
 | ssh\_user | The name of the user to allow to SSH into the instance | `string` | `"iamall"` | no |
 | zone\_prefix | The zone prefix used for deployments. Defaults to 'a'. | `string` | `"a"` | no |

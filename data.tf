@@ -68,6 +68,7 @@ data "template_file" "backup_script" {
     screen_ses     = local.screen_ses
     mc_home_folder = var.mc_home_folder
     backup_bucket  = google_storage_bucket.minecraft.name
+    world_name     = var.server_world_name
   }
 }
 
@@ -79,6 +80,7 @@ data "template_file" "restore_backup_script" {
     screen_cmd     = local.screen_cmd
     mc_home_folder = var.mc_home_folder
     backup_bucket  = google_storage_bucket.minecraft.name
+    world_name     = var.server_world_name
   }
 }
 
@@ -114,4 +116,8 @@ data "template_file" "mod_refresh_script" {
 
 data "template_file" "mc_server_conf" {
   template = file(var.server_property_template)
+
+  vars = {
+    world_name = var.server_world_name
+  }
 }
