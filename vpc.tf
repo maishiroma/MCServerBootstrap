@@ -71,7 +71,7 @@ resource "google_compute_firewall" "ingress_game_extra_tcp" {
   count = length(var.extra_tcp_game_ports) > 0 ? 1 : 0
 
   name        = "${local.unique_resource_name}-game-extra"
-  network     = data.google_compute_network.existing_network[count.index].id
+  network     = var.existing_subnetwork_name == "" ? google_compute_network.minecraft[count.index].id : data.google_compute_network.existing_network[count.index].id
   description = "Additional ingress traffic to instances for game trafffic"
 
   direction = "INGRESS"
@@ -88,7 +88,7 @@ resource "google_compute_firewall" "ingress_game_extra_udp" {
   count = length(var.extra_udp_game_ports) > 0 ? 1 : 0
 
   name        = "${local.unique_resource_name}-game-extra"
-  network     = data.google_compute_network.existing_network[count.index].id
+  network     = var.existing_subnetwork_name == "" ? google_compute_network.minecraft[count.index].id : data.google_compute_network.existing_network[count.index].id
   description = "Additional ingress traffic to instances for game trafffic"
 
   direction = "INGRESS"
