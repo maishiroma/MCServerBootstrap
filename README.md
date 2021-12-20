@@ -22,10 +22,11 @@ This project helps streamlines a majority of the steps needed to take when creat
     - Provided SSH keys to allow access to one outside user
 - One persistent SSD to store the Minecraft Server Data
 - A custom Network with one Subnetwork
-- Firewaall rules in the network to only allow specific traffic to:
+- Firewall rules in the network to only allow specific traffic to:
     - 22
     - 25565
     - icmp
+- Abiiity to add additional TCP/UDP port(s) within the range 49152 to 65535.
 - A Cloud Storage Bucket (Two if making a modded MC Server)
 
 The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults.
@@ -97,6 +98,8 @@ The overall cost to run this project varies greatly with usage and instance size
 | creds\_json | The absolute path to the credential file to auth to GCP. This needs to be associated with the GCP project that is being used | `string` | n/a | yes |
 | disk\_size | How big do you want the SSD disk to be? Defaults to 50 GB | `string` | `"50"` | no |
 | existing\_subnetwork\_name | An existing subnetwork to leverage placing the instances. Assumes that the firewalls in the subnetwork are already configured. | `string` | `""` | no |
+| extra\_tcp_game\_ports | Extra TCP ports to open on the MC instance. Note that these should be in the range of 49152 to 65535. | `list(string)` | `[]` | no |
+| extra\_udp\_game\_ports | Extra udp ports to open on the MC instance. Note that these should be in the range of 49152 to 65535. | `list(string)` | `[]` | no |
 | game\_whitelist\_ips | The IPs used to connect to the Minecraft server itself through the MC client. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
 | is\_modded | Is this Minecraft server modded? Defaults to false. | `bool` | false |
 | machine\_type | The type of machine to spin up. If the instance is struggling, it might be worthwhile to use stronger machines. | `string` | `"n1-standard-2"` | no |

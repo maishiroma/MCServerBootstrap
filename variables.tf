@@ -74,6 +74,38 @@ variable "admin_whitelist_ips" {
   type        = list(string)
 }
 
+variable "extra_tcp_game_ports" {
+  description = "Extra TCP ports to open on the MC instance. Note that these should be in the range of 49152 to 65535."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = length([for item in var.extra_tcp_game_ports : true if parseint(item, 10) >= 49152]) == length(var.extra_tcp_game_ports)
+    error_message = "One of the ports is a value smaller than 49152."
+  }
+
+  validation {
+    condition     = length([for item in var.extra_tcp_game_ports : true if parseint(item, 10) <= 65535]) == length(var.extra_tcp_game_ports)
+    error_message = "One of the ports is a value larger than 65535."
+  }
+}
+
+variable "extra_udp_game_ports" {
+  description = "Extra udp ports to open on the MC instance. Note that these should be in the range of 49152 to 65535."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = length([for item in var.extra_udp_game_ports : true if parseint(item, 10) >= 49152]) == length(var.extra_udp_game_ports)
+    error_message = "One of the ports is a value smaller than 49152."
+  }
+
+  validation {
+    condition     = length([for item in var.extra_udp_game_ports : true if parseint(item, 10) <= 65535]) == length(var.extra_udp_game_ports)
+    error_message = "One of the ports is a value larger than 65535."
+  }
+}
+
 #### Backup Variables
 
 variable "backup_length" {

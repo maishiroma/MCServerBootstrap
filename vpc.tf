@@ -1,3 +1,15 @@
+data "google_compute_subnetwork" "existing_subnet" {
+  count = var.existing_subnetwork_name != "" ? 1 : 0
+
+  name = var.existing_subnetwork_name
+}
+
+data "google_compute_network" "existing_network" {
+  count = var.existing_subnetwork_name != "" ? 1 : 0
+
+  name = basename(data.google_compute_subnetwork.existing_subnet[count.index].network)
+}
+
 resource "google_compute_network" "minecraft" {
   count = var.existing_subnetwork_name == "" ? 1 : 0
 
@@ -28,9 +40,7 @@ resource "google_compute_firewall" "ingress_game" {
 
   allow {
     protocol = "tcp"
-    ports = [
-      "25565"
-    ]
+    ports    = ["25565"]
   }
 }
 
@@ -54,6 +64,40 @@ resource "google_compute_firewall" "ingress_admin" {
     ports = [
       "22"
     ]
+  }
+}
+
+resource "google_compute_firewall" "ingress_game_extra_tcp" {
+  count = length(var.extra_tcp_game_ports) > 0 ? 1 : 0
+
+  name        = "${local.unique_resource_name}-game-extra"
+  network     = data.google_compute_network.existing_network[count.index].id
+  description = "Additional ingress traffic to instances for game trafffic"
+
+  direction = "INGRESS"
+
+  source_ranges = var.game_whitelist_ips
+
+  allow {
+    protocol = "tcp"
+    ports    = var.extra_tcp_game_ports
+  }
+}
+
+resource "google_compute_firewall" "ingress_game_extra_udp" {
+  count = length(var.extra_udp_game_ports) > 0 ? 1 : 0
+
+  name        = "${local.unique_resource_name}-game-extra"
+  network     = data.google_compute_network.existing_network[count.index].id
+  description = "Additional ingress traffic to instances for game trafffic"
+
+  direction = "INGRESS"
+
+  source_ranges = var.game_whitelist_ips
+
+  allow {
+    protocol = "udp"
+    ports    = var.extra_udp_game_ports
   }
 }
 
