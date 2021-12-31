@@ -18,7 +18,8 @@ resource "google_storage_bucket" "minecraft" {
 }
 
 resource "google_storage_bucket" "minecraft_pre_reqs" {
-  count = var.is_modded == true ? 1 : 0
+  # This is created either if this server is modded or if we are using cloud functions
+  count = var.is_modded || var.enable_cloud_func_management ? 1 : 0
 
   name          = "${local.unique_resource_name}-ext-data"
   location      = "US"

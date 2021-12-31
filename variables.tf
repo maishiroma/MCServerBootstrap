@@ -23,6 +23,11 @@ variable "project_name" {
   default     = "mc-server-bootstrap"
 }
 
+variable "gcp_project_id" {
+  description = "The Google Compute Platform Project ID. This is the ID of the project that your infrastructure is deployed under."
+  type        = string
+}
+
 #### Server Variables
 
 variable "machine_type" {
@@ -46,6 +51,13 @@ variable "ssh_user" {
 variable "ssh_pub_key_file" {
   description = "The SSH public key file to use to connect to the instance as the user specified in ssh_user"
   type        = string
+}
+
+#### Cloud Functions Variables
+variable "enable_cloud_func_management" {
+  description = "Do we want to allow for two Cloud Functions to be created to allow anyone to start/stop the MC Server via HTTP request? Default to false."
+  type        = bool
+  default     = false
 }
 
 #### Disk Variables

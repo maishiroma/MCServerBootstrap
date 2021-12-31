@@ -10,7 +10,7 @@ sleep 10
 cd ${mc_home_folder}/${world_name}
 
 zip -r -q ${mc_home_folder}/backup.zip .
-gsutil cp -R ${mc_home_folder}/backup.zip gs://${backup_bucket}/$(date "+%Y%m%d-%H%M%S")-${world_name}
+/snap/bin/gsutil cp -R ${mc_home_folder}/backup.zip gs://${backup_bucket}/$(date "+%Y%m%d-%H%M%S")-${world_name}
 
 rm -f ${mc_home_folder}/backup.zip
 
