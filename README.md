@@ -26,10 +26,11 @@ This project helps streamlines a majority of the steps needed to take when creat
     - 22
     - 25565
     - icmp
-- Abiiity to add additional TCP/UDP port(s) within the range 49152 to 65535.
-- A Cloud Storage Bucket (Two if making a modded MC Server)
+- Ability to add additional TCP/UDP port(s) within the range 49152 to 65535.
+- A Cloud Storage Bucket (Two if making a modded MC Server or using Cloud Functions)
+- Two Cloud Functions to allow anyone to start/stop the MC Server via curl or Browser
 
-The overall cost to run this project varies greatly with usage and instance size, but it should be fairly mimimum if using the project defaults.
+The overall cost to run this project varies greatly with usage and instance size, but it should be fairly minimum if using the project defaults and turning off the instance when no one is playing.
 
 ## How to Use
 
@@ -38,17 +39,19 @@ The overall cost to run this project varies greatly with usage and instance size
 | Name | Version |
 |------|---------|
 | terraform | > 0.12 |
-| google | = 3.60.0 |
-| random | = 3.1.0 |
-| template | = 2.2.0 |
+| archive | >= 2.2.0 |
+| google | >= 3.60.0 |
+| random | >= 3.1.0 |
+| template | >= 2.2.0 |
 
 ### Providers
 
 | Name | Version |
 |------|---------|
-| google | = 3.60.0 |
-| random | = 3.1.0 |
-| template | = 2.2.0 |
+| archive | >= 2.2.0 |
+| google | >= 3.60.0 |
+| random | >= 3.1.0 |
+| template | >= 2.2.0 |
 
 ### Pre-Reqs
 
@@ -93,20 +96,22 @@ The overall cost to run this project varies greatly with usage and instance size
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | admin\_whitelist\_ips | The IPs to allow for SSH and ping access, generally reseved for operational work/troubleshooting. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
-| backup\_cron | How often will the backups run on the instance? This must be written in cron syntax. Defaults to once a week on Sats at 3AM | `string` | `0 3 * * 6` | no |
+| backup\_cron | How often will the backups run on the instance? This must be written in cron syntax. Defaults to once a week on Sats at 3AM | `string` | `"0 3 * * 6"` | no |
 | backup\_length | How many days will a backup last in the bucket? | `number` | `5` | no |
 | creds\_json | The absolute path to the credential file to auth to GCP. This needs to be associated with the GCP project that is being used | `string` | n/a | yes |
 | disk\_size | How big do you want the SSD disk to be? Defaults to 50 GB | `string` | `"50"` | no |
+| enable\_cloud\_func\_management | Do we want to allow for two Cloud Functions to be created to allow anyone to start/stop the MC Server via HTTP request? Default to false. | `bool` | `false` | no |
 | existing\_subnetwork\_name | An existing subnetwork to leverage placing the instances. Assumes that the firewalls in the subnetwork are already configured. | `string` | `""` | no |
-| extra\_tcp_game\_ports | Extra TCP ports to open on the MC instance. Note that these should be in the range of 49152 to 65535. | `list(string)` | `[]` | no |
+| extra\_tcp\_game\_ports | Extra TCP ports to open on the MC instance. Note that these should be in the range of 49152 to 65535. | `list(string)` | `[]` | no |
 | extra\_udp\_game\_ports | Extra udp ports to open on the MC instance. Note that these should be in the range of 49152 to 65535. | `list(string)` | `[]` | no |
 | game\_whitelist\_ips | The IPs used to connect to the Minecraft server itself through the MC client. If existing\_subnetwork\_name is specified, this will be ignored. | `list(string)` | n/a | yes |
-| is\_modded | Is this Minecraft server modded? Defaults to false. | `bool` | false |
+| gcp\_project\_id | The Google Compute Platform Project ID. This is the ID of the project that your infrastructure is deployed under. | `string` | n/a | yes |
+| is\_modded | Is this Minecraft server modded? Defaults to false. | `bool` | `false` | no |
 | machine\_type | The type of machine to spin up. If the instance is struggling, it might be worthwhile to use stronger machines. | `string` | `"n1-standard-2"` | no |
+| mc\_forge\_server\_download\_link | The direct download link to MC forge for modding support. Defaults to version 1.16.5. | `string` | `"https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.1.0/forge-1.16.5-36.1.0-installer.jar"` | no |
 | mc\_home\_folder | The location of the Minecraft server files on the instance | `string` | `"/home/minecraft"` | no |
-| mc\_forge\_server\_download\_link | The direct download link to MC forge for modding support. Defaults to version 1.16.5. | `string` | "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.1.0/forge-1.16.5-36.1.0-installer.jar"
 | mc\_server\_download\_link | The direct download link to download the server jar. Defaults to a link with 1.16.5. | `string` | `"https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"` | no |
-| override\_server\_activate\_cmd | Should the bootstrap use a different server command than java -Xms server_min_ram -Xmx server_max_ram -jar /home/minecraft/server.jar nogui? If left blank, uses said default command | `string` | "" | no
+| override\_server\_activate\_cmd | Should the bootstrap use a different server command than java -Xms server\_min\_ram -Xmx server\_max\_ram -jar /home/minecraft/server.jar nogui? If left blank, uses said default command | `string` | `""` | no |
 | project\_name | The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name. | `string` | `"mc-server-bootstrap"` | no |
 | region | The region used to place these resources. Defaults to us-west1 | `string` | `"us-west2"` | no |
 | server\_image | The boot image used on the server. Defaults to `ubuntu-1804-bionic-v20191211` | `string` | `"ubuntu-1804-bionic-v20191211"` | no |
@@ -122,6 +127,7 @@ The overall cost to run this project varies greatly with usage and instance size
 
 | Name | Description |
 |------|-------------|
+| cloud\_funcs\_http\_triggers | The URLs that correspond to the Cloud Functions, if created |
 | created\_subnetwork | The name of the created subnetwork that was provisioned in this module. Can be used to provision more servers in the same network if desired |
 | ext\_bucket\_name | The name of the Cloud Storage Bucket used to hold any persistent MC data. |
 | server\_ip\_address | The ephimeral public IP address used to access this instance. |
@@ -140,6 +146,7 @@ While most of the configuration has verbose descriptions, there are some options
 | `server_property_template` | This could change consistenty in the server, making it tricky to keep track of in this code. As such, any new changes made after the initial deployment of the server will __NOT__ be reflected in code. To use a new config if one changed it outside of the server, one must manually go onto the instance and edit the config to match what is down in code. |
 | `existing_subnetwork_name` | This allows for multiple instances of this module to be deployed in the same network, for easier management. To properly use this, make sure one module of this stack is deployed, with the other module calls referencing the `created_subnetwork` output of the first module. |
 | `override_server_activate_cmd` | There is a slight change in the logic for bootstrapping Forge in 1.18, specifically with the nonexistance of the server jar to run after installing Forge. Instead, they change running the command to just a bash script, `run.sh`. This needs to be reflected in the command, hence this variable. |
+| `enable_cloud_func_management` | By default, only those who have SSH access to the server and/or GCP console can turn off/on the server. However, when this is set to `true`, the module outputs two URLs that allow **anyone** to turn off/on the instance by visiting said link. |
 
 ## General Server Management
 
@@ -164,6 +171,10 @@ However, if needed, the following server actions can be performed:
     - `/home/minecraft/scripts/restore_backup.sh` (default location)
         - Restores the server world to the specified state
             - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
+
+Additionally, if `enable_cloud_func_management` is set to `true`, *anyon*e* with the outputted URLs that the module outputs at `cloud_funcs_http_triggers` can turn off/on the instance. This can be helpful if one wants to give more control to the players on when to play/stop playing.
+
+> NOTE: By setting the above boolean to true, you are **RESPONSIBLE** for making sure that those URLs are not misused. Please be wary of that.
 
 To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
 
@@ -208,9 +219,10 @@ As mentioned previously, all modded servers have an additional script located in
         - Delete the `world` folder and run `restart.sh` to start up the server again
         - Remove all contents of the `minecraft` folder and rerun the startup script
         - Perform a `terraform destroy` and then a `terraform apply`
+- *Problem*: I created the Cloud Functions, but when I navigate to them on my browser or `curl`, it takes a long time!
+    - **Resolution**: *Be patient!* It is normal to have those links appear *hanging* for a few seconds. You will **ALWAYS** get a response back via plain HTTP after visiting those links, so just keep the tab open/command running.
 
 ## Future Goals
-- [ ] Create a Cloud Function that will allow for anyone authenticated to auto start and stop the server.
 
 ## Inspiration
 

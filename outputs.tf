@@ -12,3 +12,8 @@ output "ext_bucket_name" {
   description = "The name of the Cloud Storage Bucket used to hold any persistent MC data."
   value       = google_storage_bucket.minecraft_pre_reqs.*.name
 }
+
+output "cloud_funcs_http_triggers" {
+  description = "The URLs that correspond to the Cloud Functions, if created"
+  value       = google_cloudfunctions_function.server_toggle.*.https_trigger_url
+}
