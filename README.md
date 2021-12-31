@@ -73,7 +73,10 @@ The overall cost to run this project varies greatly with usage and instance size
 > Be careful with that key! __It has admin API access to your entire GCP account__, meaning anything can be deployed in GCP using said key. More savy GCP users can use a role that is less wide in scope for this project, but for the sake of this walkthrough, you can proceed with these permissions.
 
 4. Enable the following APIs in the GCP Console:
-    - `Compute Engine API`
+    - `Compute Engine API` (Required)
+    - `Cloud Storage API` (Required)
+    - `IAM Service Account Credentials API` (Only if using Cloud Functions)
+    - `Cloud Build API` (Only if using Cloud Functions)
 5. Create a Terraform directoty, using this [example](./example) as a basis. Make sure to keep these in mind:
     - Change the __project name__ in `main.tf` if you are not using the project name in there.
     - Create a `terraform.tfvars` and define the following values:
