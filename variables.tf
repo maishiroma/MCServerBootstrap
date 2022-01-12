@@ -6,7 +6,7 @@ variable "creds_json" {
 }
 
 variable "region" {
-  description = "The region used to place these resources. Defaults to us-west1"
+  description = "The region used to place these resources. Defaults to us-west2."
   type        = string
   default     = "us-west2"
 }
