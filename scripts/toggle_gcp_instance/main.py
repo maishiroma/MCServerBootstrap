@@ -91,8 +91,10 @@ def return_instance_status(client, instance_name):
 
 def start_instance(client, instance_name):
     """
-    We start up the instance if it has been stopped. Returns True if succesful. Returns
-    False if not
+    We start up the instance if it has been stopped. We return an integer, based on what happened
+        0: Success
+        1: Failed
+        2: Failed due to outside issues
     """
 
     if return_instance_status(client, instance_name)["status"] == "TERMINATED":
@@ -109,21 +111,24 @@ def start_instance(client, instance_name):
             curr_try += 1
             if curr_try >= max_tries:
                 print("Instance still spinning up, check console for status")
-                return True
+                return 2
 
             loader_index += 1
             if loader_index >= len(loader):
                 loader_index = 0
 
         print("Instance is now running!")
-        return True
+        return 0
     print("Instance is already running!")
-    return False
+    return 1
 
 
 def stop_instance(client, instance_name):
     """
-    We stop the instance if it has been running. Returns true if sucessful.
+    We stop the instance if it has been running. We return an integer, based on what happened
+        0: Success
+        1: Failed
+        2: Failed due to outside issues
     """
 
     if return_instance_status(client, instance_name)["status"] == "RUNNING":
@@ -140,16 +145,16 @@ def stop_instance(client, instance_name):
             curr_try += 1
             if curr_try >= max_tries:
                 print("Instance still spinning down, check console for status")
-                return True
+                return 2
 
             loader_index += 1
             if loader_index >= len(loader):
                 loader_index = 0
 
         print("Instance is now stopped!")
-        return True
+        return 0
     print("Instance is already stopped!")
-    return False
+    return 1
 
 
 def http_post(request):
@@ -164,25 +169,29 @@ def http_post(request):
     tag = os.environ.get("INST_TAG", "")
 
     if mode == "" or tag == "":
-        return "Key values, mode or tag missing. Please consult owner of deployment."
+        return "Key values, mode or tag missing. Please consult server owner."
     else:
         instance_name = return_instance_name(client, tag)
 
         if mode == "start":
             result = start_instance(client, instance_name)
             new_status = return_instance_status(client, instance_name)
-            if result is True:
+            if result == 0:
                 return "MC Server has started. Give it a minute before connecting. IP: {ip}".format(
                     ip=new_status["public_ip"]
                 )
-            else:
+            elif result == 1:
                 return "MC Server is already running at {ip}!".format(ip=new_status["public_ip"])
+            else:
+                return "MC Server failed to start due to other reasons. Please consult server owner."
         elif mode == "stop":
             result = stop_instance(client, instance_name)
-            if result is True:
+            if result == 0:
                 return "MC Server has stopped. Thanks for saving money! <3"
-            else:
+            elif result == 1:
                 return "MC Server has already stopped."
+            else:
+                return "MC Server failed to stop due to other reasons. Please consult server owner."
         else:
             return "Invalid mode. Check URL used to invoke me?"
 
@@ -196,7 +205,7 @@ def local_exec():
 
     instance_name = return_instance_name(client, args.tag)
     if args.mode == "start":
-        ending = start_instance(client, instance_name)
+        start_instance(client, instance_name)
         instance_details = return_instance_status(client, instance_name)
         print("Public IP: {ip}".format(ip=instance_details["public_ip"]))
     elif args.mode == "stop":
@@ -228,9 +237,14 @@ else:
     PROJECT = os.environ.get("PROJECT", "")
     ZONE = os.environ.get("INST_ZONE", "")
 
+    if PROJECT == "" or ZONE == "":
+        print("Lambda env vars, PROJECT or ZONE is not set. Please set them.")
+        sys.exit(1)
+
 # Running locally uses creds sourced locally
 # Running on Cloud Functions uses IAM role of Cloud Function
 client = gcp.build("compute", "v1")
 
+# This is only ran when running locally
 if __name__ == "__main__":
     local_exec()
