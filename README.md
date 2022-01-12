@@ -116,7 +116,7 @@ The overall cost to run this project varies greatly with usage and instance size
 | mc\_server\_download\_link | The direct download link to download the server jar. Defaults to a link with 1.16.5. | `string` | `"https://launcher.mojang.com/v1/objects/35139deedbd5182953cf1caa23835da59ca3d7cd/server.jar"` | no |
 | override\_server\_activate\_cmd | Should the bootstrap use a different server command than java -Xms server\_min\_ram -Xmx server\_max\_ram -jar /home/minecraft/server.jar nogui? If left blank, uses said default command | `string` | `""` | no |
 | project\_name | The name of the project. Not to be confused with the project name in GCP; this is moreso a terraform project name. | `string` | `"mc-server-bootstrap"` | no |
-| region | The region used to place these resources. Defaults to us-west1 | `string` | `"us-west2"` | no |
+| region | The region used to place these resources. Defaults to us-west2. | `string` | `"us-west2"` | no |
 | server\_image | The boot image used on the server. Defaults to `ubuntu-1804-bionic-v20191211` | `string` | `"ubuntu-1804-bionic-v20191211"` | no |
 | server\_max\_ram | The maximum amount of RAM to allocate to the server process | `string` | `"7G"` | no |
 | server\_min\_ram | The minimum amount of RAM to allocate to the server process | `string` | `"1G"` | no |
@@ -175,11 +175,11 @@ However, if needed, the following server actions can be performed:
         - Restores the server world to the specified state
             - Ex: `$ cd /home/minecraft/scripts && sudo ./restore_backup.sh nameOfBackup`
 
-Additionally, if `enable_cloud_func_management` is set to `true`, *anyon*e* with the outputted URLs that the module outputs at `cloud_funcs_http_triggers` can turn off/on the instance. This can be helpful if one wants to give more control to the players on when to play/stop playing.
+If `enable_cloud_func_management` is set to `true`, *anyone* with the outputted URLs that the module outputs at `cloud_funcs_http_triggers` can turn off/on the instance. This can be helpful if one wants to give more control to the players on when to play/stop playing.
 
-> NOTE: By setting the above boolean to true, you are **RESPONSIBLE** for making sure that those URLs are not misused. Please be wary of that.
+> NOTE: By setting `enable_cloud_func_management` to true, you are **RESPONSIBLE** for making sure that those URLs are not misused. Please be wary of that.
 
-To keep costs low, it is a good idea to stop this instance when it is not in use. This can be done via the GCP console and/or the CLI.
+There is also a python script called `toggle_gcp_instance`, that can be invoked manually to help automate instance shutoff/startup. Refer to it [here](./scripts/toggle_gcp_instance/README.md) for more details.
 
 ## Modded Server Management
 
@@ -224,8 +224,8 @@ As mentioned previously, all modded servers have an additional script located in
         - Perform a `terraform destroy` and then a `terraform apply`
 - *Problem*: I created the Cloud Functions, but when I navigate to them on my browser or `curl`, it takes a long time!
     - **Resolution**: *Be patient!* It is normal to have those links appear *hanging* for a few seconds. You will **ALWAYS** get a response back via plain HTTP after visiting those links, so just keep the tab open/command running.
-
-## Future Goals
+- *Problem*: I ran the Cloud Function and it gave me an error on something failed!
+    - **Resolution**: s the message suggests, check the logs when trying to invoke the function. There is enough verbal output to allow one to troubleshoot the function.
 
 ## Inspiration
 
