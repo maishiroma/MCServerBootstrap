@@ -1,5 +1,5 @@
 # Minecraft Server Bootstrap in GCP
-Welcome to my small, but humble Terraform module for a vanilla Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/)!
+Welcome to my small, but humble Terraform module for a Minecraft server, hosted in [Google Cloud Platform](https://console.cloud.google.com/)!
 
 ![meme](https://gifimage.net/wp-content/uploads/2017/08/its-alive-gif-20.gif)
 
@@ -153,7 +153,7 @@ While most of the configuration has verbose descriptions, there are some options
 
 ## General Server Management
 
-By default, rebooting and respinning up an instance will automatically set up the Minecraft Server for you. No need for any action on your part!
+By default, rebooting and respinning up an instance will automatically set up the Minecraft Server for you. Backups of your world are auto created when the server is terminated. No need for any action on your part!
 
 However, if needed, the following server actions can be performed:
 - **Stopping the Server**

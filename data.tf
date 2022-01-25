@@ -85,7 +85,8 @@ data "template_file" "shutdown" {
   template = file("${path.module}/templates/shutdown.tpl")
 
   vars = {
-    screen_ses = local.screen_ses
+    screen_ses         = local.screen_ses
+    mc_script_location = local.mc_script_location
   }
 }
 
